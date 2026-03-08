@@ -2,6 +2,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -24,6 +27,8 @@ export default function RootLayout({ children }) {
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
+				{/* Avoids an extra round-trip for UploadThing component hydration */}
+				<NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
 				<AuthProvider>
 					{children}
 					<Toaster richColors position='top-right' />

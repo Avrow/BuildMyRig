@@ -1,0 +1,152 @@
+[
+	{
+		"name": "AMD Ryzen 7 7800X3D",
+		"brand": "AMD",
+		"price": 329,
+		"specs": {
+			"cores": 8,
+			"threads": 16,
+			"baseClock": "4.2 GHz",
+			"boostClock": "5.0 GHz",
+			"tdp": 120,
+			"socket": "AM5",
+			"cache": "96 MB L3",
+			"architecture": "Zen 4 + 3D V-Cache"
+		}
+	},
+	{
+		"name": "AMD Ryzen 9 7950X3D",
+		"brand": "AMD",
+		"price": 699,
+		"specs": {
+			"cores": 16,
+			"threads": 32,
+			"baseClock": "4.2 GHz",
+			"boostClock": "5.7 GHz",
+			"tdp": 120,
+			"socket": "AM5",
+			"cache": "128 MB L3",
+			"architecture": "Zen 4 + 3D V-Cache"
+		}
+	},
+	{
+		"name": "AMD Ryzen 5 7600X",
+		"brand": "AMD",
+		"price": 199,
+		"specs": {
+			"cores": 6,
+			"threads": 12,
+			"baseClock": "4.7 GHz",
+			"boostClock": "5.3 GHz",
+			"tdp": 105,
+			"socket": "AM5",
+			"cache": "32 MB L3",
+			"architecture": "Zen 4"
+		}
+	},
+	{
+		"name": "AMD Ryzen 5 5600X",
+		"brand": "AMD",
+		"price": 129,
+		"specs": {
+			"cores": 6,
+			"threads": 12,
+			"baseClock": "3.7 GHz",
+			"boostClock": "4.6 GHz",
+			"tdp": 65,
+			"socket": "AM4",
+			"cache": "32 MB L3",
+			"architecture": "Zen 3"
+		}
+	},
+	{
+		"name": "Intel Core i9-14900K",
+		"brand": "Intel",
+		"price": 409,
+		"specs": {
+			"cores": 24,
+			"threads": 32,
+			"baseClock": "3.2 GHz",
+			"boostClock": "6.0 GHz",
+			"tdp": 125,
+			"socket": "LGA1700",
+			"cache": "36 MB L3",
+			"architecture": "Raptor Lake Refresh"
+		}
+	},
+	{
+		"name": "Intel Core i7-14700K",
+		"brand": "Intel",
+		"price": 319,
+		"specs": {
+			"cores": 20,
+			"threads": 28,
+			"baseClock": "3.4 GHz",
+			"boostClock": "5.6 GHz",
+			"tdp": 125,
+			"socket": "LGA1700",
+			"cache": "33 MB L3",
+			"architecture": "Raptor Lake Refresh"
+		}
+	},
+	{
+		"name": "Intel Core i5-14600K",
+		"brand": "Intel",
+		"price": 239,
+		"specs": {
+			"cores": 14,
+			"threads": 20,
+			"baseClock": "3.5 GHz",
+			"boostClock": "5.3 GHz",
+			"tdp": 125,
+			"socket": "LGA1700",
+			"cache": "24 MB L3",
+			"architecture": "Raptor Lake Refresh"
+		}
+	},
+	{
+		"name": "Intel Core i9-13900KS",
+		"brand": "Intel",
+		"price": 359,
+		"specs": {
+			"cores": 24,
+			"threads": 32,
+			"baseClock": "3.2 GHz",
+			"boostClock": "6.0 GHz",
+			"tdp": 150,
+			"socket": "LGA1700",
+			"cache": "36 MB L3",
+			"architecture": "Raptor Lake"
+		}
+	},
+	{
+		"name": "AMD Ryzen 9 9950X",
+		"brand": "AMD",
+		"price": 649,
+		"specs": {
+			"cores": 16,
+			"threads": 32,
+			"baseClock": "4.3 GHz",
+			"boostClock": "5.7 GHz",
+			"tdp": 170,
+			"socket": "AM5",
+			"cache": "64 MB L3",
+			"architecture": "Zen 5"
+		}
+	},
+	{
+		"name": "Intel Core Ultra 9 285K",
+		"brand": "Intel",
+		"price": 479,
+		"specs": {
+			"cores": 24,
+			"threads": 24,
+			"baseClock": "3.2 GHz",
+			"boostClock": "5.7 GHz",
+			"tdp": 125,
+			"socket": "LGA1851",
+			"cache": "36 MB L3",
+			"architecture": "Arrow Lake"
+		}
+	}
+]

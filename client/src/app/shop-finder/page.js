@@ -22,7 +22,7 @@ const ShopFinder = () => {
 
     const fetchShops = async () => {
         try {
-            const response = await fetch("/api/shops");
+            const response = await fetch("http://localhost:8000/api/shops");
             const data = await response.json();
             
             if (data.success) {

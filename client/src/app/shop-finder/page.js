@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Search, MapPin, Phone, ExternalLink, CheckCircle, Store } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 
 const ShopFinder = () => {
@@ -73,106 +69,167 @@ const ShopFinder = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white dark:bg-slate-950">
+            <div style={{ minHeight: "100vh", backgroundColor: "#ffffff", color: "#0f172a" }}>
                 <Navbar />
-                <div className="flex items-center justify-center min-h-[50vh]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "50vh" }}>
+                    <div style={{
+                        width: "48px",
+                        height: "48px",
+                        border: "4px solid #e2e8f0",
+                        borderTop: "4px solid #2563eb",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite"
+                    }}></div>
                 </div>
+                <style jsx>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-slate-950">
+        <div style={{ minHeight: "100vh", backgroundColor: "#ffffff", color: "#0f172a" }}>
             <Navbar />
             
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+            <div style={{ maxWidth: "1152px", margin: "0 auto", padding: "0 16px 32px" }}>
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                <div style={{ textAlign: "center", marginBottom: "32px" }}>
+                    <h1 style={{ fontSize: "36px", fontWeight: "bold", color: "#0f172a", marginBottom: "16px" }}>
                         Shop Finder
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+                    <p style={{ color: "#64748b", maxWidth: "672px", margin: "0 auto", lineHeight: "1.6" }}>
                         Find the best computer shops in your area. Browse verified stores with contact details and directions.
                     </p>
                 </div>
 
                 {/* Filters */}
-                <Card className="mb-8">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Search className="h-5 w-5" />
-                            Search & Filter
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Search by name or address
-                                </label>
-                                <Input
-                                    placeholder="Search shops..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Filter by area
-                                </label>
-                                <Select value={selectedArea} onValueChange={handleAreaFilter}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select area" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="">All areas</SelectItem>
-                                        {areas.map((area) => (
-                                            <SelectItem key={area} value={area}>
-                                                {area}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            
-                            <div className="flex items-end">
-                                <Button 
-                                    onClick={clearFilters}
-                                    variant="outline"
-                                    className="w-full"
-                                >
-                                    Clear Filters
-                                </Button>
-                            </div>
+                <div style={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "12px",
+                    padding: "24px",
+                    marginBottom: "32px",
+                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
+                }}>
+                    <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <Search size={20} />
+                        Search & Filter
+                    </h2>
+                    
+                    <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                        gap: "16px"
+                    }}>
+                        <div>
+                            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", color: "#475569", marginBottom: "8px" }}>
+                                Search by name or address
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Search shops..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "10px 12px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "6px",
+                                    fontSize: "14px",
+                                    outline: "none",
+                                    transition: "border-color 0.2s"
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = "#2563eb"}
+                                onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                            />
                         </div>
-                    </CardContent>
-                </Card>
+                        
+                        <div>
+                            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", color: "#475569", marginBottom: "8px" }}>
+                                Filter by area
+                            </label>
+                            <select
+                                value={selectedArea}
+                                onChange={(e) => handleAreaFilter(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "10px 12px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "6px",
+                                    fontSize: "14px",
+                                    outline: "none",
+                                    backgroundColor: "#ffffff",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                <option value="">All areas</option>
+                                {areas.map((area) => (
+                                    <option key={area} value={area}>
+                                        {area}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        <div style={{ display: "flex", alignItems: "flex-end" }}>
+                            <button
+                                onClick={clearFilters}
+                                style={{
+                                    width: "100%",
+                                    padding: "10px 16px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "6px",
+                                    fontSize: "14px",
+                                    fontWeight: "500",
+                                    backgroundColor: "#ffffff",
+                                    color: "#374151",
+                                    cursor: "pointer",
+                                    transition: "background-color 0.2s"
+                                }}
+                                onMouseOver={(e) => e.target.style.backgroundColor = "#f9fafb"}
+                                onMouseOut={(e) => e.target.style.backgroundColor = "#ffffff"}
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Results */}
-                <div className="mb-4">
-                    <p className="text-slate-600 dark:text-slate-400">
+                <div style={{ marginBottom: "16px" }}>
+                    <p style={{ color: "#64748b" }}>
                         {filteredShops.length} {filteredShops.length === 1 ? "shop" : "shops"} found
                     </p>
                 </div>
 
                 {/* Shop Cards */}
                 {filteredShops.length === 0 ? (
-                    <Card className="text-center py-12">
-                        <CardContent>
-                            <Store className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                                No shops found
-                            </h3>
-                            <p className="text-slate-500 dark:text-slate-400">
-                                Try adjusting your filters or search terms
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <div style={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        padding: "48px 24px",
+                        textAlign: "center",
+                        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
+                    }}>
+                        <Store size={48} style={{ color: "#94a3b8", margin: "0 auto 16px" }} />
+                        <h3 style={{ fontSize: "18px", fontWeight: "600", color: "#0f172a", marginBottom: "8px" }}>
+                            No shops found
+                        </h3>
+                        <p style={{ color: "#64748b" }}>
+                            Try adjusting your filters or search terms
+                        </p>
+                    </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                        gap: "24px"
+                    }}>
                         {filteredShops.map((shop) => (
                             <ShopCard key={shop._id} shop={shop} />
                         ))}
@@ -185,52 +242,70 @@ const ShopFinder = () => {
 
 const ShopCard = ({ shop }) => {
     return (
-        <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-                <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+        <div style={{
+            backgroundColor: "#ffffff",
+            border: "1px solid #e2e8f0",
+            borderRadius: "12px",
+            padding: "24px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+            transition: "box-shadow 0.2s"
+        }}
+        onMouseOver={(e) => e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)"}
+        onMouseOut={(e) => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)"}
+        >
+            <div style={{ marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <div style={{ flex: 1 }}>
+                        <h3 style={{ fontSize: "18px", fontWeight: "600", color: "#0f172a", marginBottom: "8px" }}>
                             {shop.shopName}
-                        </CardTitle>
-                        <div className="flex items-center gap-2 mb-2">
-                            <MapPin className="h-4 w-4 text-slate-500" />
-                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                        </h3>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                            <MapPin size={16} style={{ color: "#64748b" }} />
+                            <span style={{ fontSize: "14px", color: "#64748b" }}>
                                 {shop.area}
                             </span>
                             {shop.verified && (
-                                <div className="flex items-center gap-1 text-green-600">
-                                    <CheckCircle className="h-4 w-4" />
-                                    <span className="text-xs font-medium">Verified</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#059669" }}>
+                                    <CheckCircle size={16} />
+                                    <span style={{ fontSize: "12px", fontWeight: "500" }}>Verified</span>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
-            </CardHeader>
+            </div>
             
-            <CardContent className="space-y-3">
-                <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-slate-500 mt-0.5" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
+            <div style={{ spaceY: "12px" }}>
+                <div style={{ marginBottom: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "8px" }}>
+                        <MapPin size={16} style={{ color: "#64748b", marginTop: "2px" }} />
+                        <span style={{ fontSize: "14px", color: "#64748b", lineHeight: "1.5" }}>
                             {shop.address}
                         </span>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <Phone size={16} style={{ color: "#64748b" }} />
+                        <span style={{ fontSize: "14px", color: "#64748b" }}>
                             {shop.phone}
                         </span>
                     </div>
                 </div>
 
                 {shop.categories && shop.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "16px" }}>
                         {shop.categories.map((category, index) => (
                             <span
                                 key={index}
-                                className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded"
+                                style={{
+                                    display: "inline-block",
+                                    padding: "4px 8px",
+                                    fontSize: "12px",
+                                    fontWeight: "500",
+                                    backgroundColor: "#dbeafe",
+                                    color: "#1e40af",
+                                    borderRadius: "4px"
+                                }}
                             >
                                 {category}
                             </span>
@@ -239,25 +314,42 @@ const ShopCard = ({ shop }) => {
                 )}
 
                 {shop.googleMapLink && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        asChild
+                    <a
+                        href={shop.googleMapLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            width: "100%",
+                            padding: "10px 16px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "6px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            backgroundColor: "#ffffff",
+                            color: "#374151",
+                            textDecoration: "none",
+                            cursor: "pointer",
+                            transition: "background-color 0.2s"
+                        }}
+                        onMouseOver={(e) => {
+                            e.target.style.backgroundColor = "#f9fafb";
+                            e.target.style.textDecoration = "none";
+                        }}
+                        onMouseOut={(e) => {
+                            e.target.style.backgroundColor = "#ffffff";
+                            e.target.style.textDecoration = "none";
+                        }}
                     >
-                        <a
-                            href={shop.googleMapLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2"
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            View on Maps
-                        </a>
-                    </Button>
+                        <ExternalLink size={16} />
+                        View on Maps
+                    </a>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

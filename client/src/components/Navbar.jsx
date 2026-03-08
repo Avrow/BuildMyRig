@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -32,9 +32,10 @@ export default function Navbar() {
 		}
 	};
 
-	const navLinks = user
-		? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }]
-		: [];
+	const navLinks = [
+		{ href: "/shop-finder", label: "Shop Finder", icon: Store },
+		...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : [])
+	];
 
 	return (
 		<header className='sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-slate-950/80 backdrop-blur-md'>

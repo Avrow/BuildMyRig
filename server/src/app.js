@@ -4,6 +4,7 @@ import cors from "cors";
 
 // Add routes
 import authRoute from "./routes/auth.route.js";
+import shopRoute from "./routes/shop.route.js";
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.get("/health-check", (req, res) => {
 
 // done: add auth route
 app.use("/api/auth", authRoute);
+// Add shop routes
+app.use("/api/shops", shopRoute);
 // TODO: add user route
 
 // Fallback route for undefined endpoints

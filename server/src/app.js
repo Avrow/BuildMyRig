@@ -5,7 +5,9 @@ import cors from "cors";
 // Add routes
 import authRoute from "./routes/auth.route.js";
 import componentRoute from "./routes/component.route.js";
-import shopRoute from "./routes/shop.route.js";
+import newsRouter from "./routes/news.route.js";
+import commentRouter from "./routes/comment.route.js";
+import postRouter from "./routes/post.route.js";
 
 const app = express();
 
@@ -31,9 +33,14 @@ app.get("/health-check", (req, res) => {
 app.use("/api/auth", authRoute);
 // done: add component vault route
 app.use("/api/components", componentRoute);
-// Add shop routes
-app.use("/api/shops", shopRoute);
-// TODO: add user route
+
+app.use("/api/posts", postRouter);
+
+// todo: new
+app.use("/api/news", newsRouter);
+
+// todo: new
+app.use("/api/comments", commentRouter);
 
 // Fallback route for undefined endpoints
 app.use("/", (req, res) => {

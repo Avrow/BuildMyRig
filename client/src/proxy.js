@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const PROTECTED_ROUTES = ["/dashboard"];
+const PROTECTED_ROUTES = ["/dashboard", "/accessall"];
 const AUTH_ROUTES = ["/signin", "/signup"];
 
 export function proxy(request) {
@@ -27,5 +27,5 @@ export function proxy(request) {
 }
 
 export const config = {
-	matcher: ["/dashboard/:path*", "/signin", "/signup"],
+	matcher: ["/dashboard/:path*", "/accessall/:path*", "/signin", "/signup"],
 };

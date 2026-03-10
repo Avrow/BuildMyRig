@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useCallback, useTransition, useState, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,16 +19,17 @@ const TYPES = [
 ];
 
 const TYPE_COLORS = {
-	CPU: "bg-blue-600/20 text-blue-400 border-blue-600/40 hover:bg-blue-600/30",
-	GPU: "bg-purple-600/20 text-purple-400 border-purple-600/40 hover:bg-purple-600/30",
-	RAM: "bg-green-600/20 text-green-400 border-green-600/40 hover:bg-green-600/30",
+	CPU: "bg-blue-600/20 text-blue-500 dark:text-blue-400 border-blue-600/40 hover:bg-blue-600/30",
+	GPU: "bg-purple-600/20 text-purple-500 dark:text-purple-400 border-purple-600/40 hover:bg-purple-600/30",
+	RAM: "bg-green-600/20 text-green-500 dark:text-green-400 border-green-600/40 hover:bg-green-600/30",
 	Storage:
-		"bg-yellow-600/20 text-yellow-400 border-yellow-600/40 hover:bg-yellow-600/30",
+		"bg-yellow-600/20 text-yellow-600 dark:text-yellow-400 border-yellow-600/40 hover:bg-yellow-600/30",
 	Motherboard:
-		"bg-red-600/20 text-red-400 border-red-600/40 hover:bg-red-600/30",
-	PSU: "bg-orange-600/20 text-orange-400 border-orange-600/40 hover:bg-orange-600/30",
-	Case: "bg-cyan-600/20 text-cyan-400 border-cyan-600/40 hover:bg-cyan-600/30",
-	Cooler: "bg-sky-600/20 text-sky-400 border-sky-600/40 hover:bg-sky-600/30",
+		"bg-red-600/20 text-red-500 dark:text-red-400 border-red-600/40 hover:bg-red-600/30",
+	PSU: "bg-orange-600/20 text-orange-500 dark:text-orange-400 border-orange-600/40 hover:bg-orange-600/30",
+	Case: "bg-cyan-600/20 text-cyan-500 dark:text-cyan-400 border-cyan-600/40 hover:bg-cyan-600/30",
+	Cooler:
+		"bg-sky-600/20 text-sky-500 dark:text-sky-400 border-sky-600/40 hover:bg-sky-600/30",
 };
 
 export { TYPE_COLORS };
@@ -41,6 +42,15 @@ export default function VaultFilters() {
 
 	const currentSearch = searchParams.get("search") ?? "";
 	const currentType = searchParams.get("type") ?? "";
+
+	// Controlled local state so the input stays in sync with URL (e.g. after clearAll)
+	const [inputValue, setInputValue] = useState(currentSearch);
+	const debounceRef = useRef(null);
+
+	// Keep input in sync when URL changes externally (e.g. browser back/forward)
+	useEffect(() => {
+		setInputValue(currentSearch);
+	}, [currentSearch]);
 
 	const updateParams = useCallback(
 		(updates) => {
@@ -63,7 +73,12 @@ export default function VaultFilters() {
 
 	function handleSearch(e) {
 		const value = e.target.value;
-		updateParams({ search: value });
+		setInputValue(value);
+		// Debounce URL update so we don't push on every keystroke
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			updateParams({ search: value });
+		}, 350);
 	}
 
 	function handleTypeToggle(type) {
@@ -86,12 +101,12 @@ export default function VaultFilters() {
 				<Input
 					type='search'
 					placeholder='Search components… (e.g. Ryzen 9, RTX 4090)'
-					defaultValue={currentSearch}
+					value={inputValue}
 					onChange={handleSearch}
-					className='pl-9 bg-gray-900 border-gray-700 focus-visible:ring-blue-500 text-white placeholder:text-gray-500'
+					className='pl-9 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus-visible:ring-blue-500 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500'
 				/>
 				{isPending && (
-					<span className='absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 animate-pulse'>
+					<span className='absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 animate-pulse'>
 						Loading…
 					</span>
 				)}
@@ -99,7 +114,7 @@ export default function VaultFilters() {
 
 			{/* Type pills */}
 			<div className='flex flex-wrap items-center gap-2'>
-				<SlidersHorizontal className='h-4 w-4 text-gray-500 shrink-0' />
+				<SlidersHorizontal className='h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0' />
 				{TYPES.map((type) => {
 					const isActive = currentType === type;
 					return (
@@ -109,7 +124,7 @@ export default function VaultFilters() {
 							className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors cursor-pointer ${
 								isActive
 									? TYPE_COLORS[type]
-									: "bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200"
+									: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
 							}`}
 						>
 							{type}
@@ -122,7 +137,7 @@ export default function VaultFilters() {
 						variant='ghost'
 						size='sm'
 						onClick={clearAll}
-						className='text-gray-500 hover:text-gray-200 h-7 px-2 gap-1'
+						className='text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 h-7 px-2 gap-1'
 					>
 						<X className='h-3 w-3' />
 						Clear

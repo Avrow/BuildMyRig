@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { fetchBingImage } from "@/lib/fetchBingImage";
+import { fetchSerperImage } from "@/lib/fetchBingImage";
 
 /**
  * GET /api/bing-image?q=AMD+Ryzen+7+7800X3D+box
  *
- * Proxy route that keeps the Bing API key on the server.
+ * Proxy route that keeps the Serper API key on the server.
  * Returns: { url: string }
  */
 export async function GET(request) {
@@ -19,7 +19,7 @@ export async function GET(request) {
 	}
 
 	try {
-		const url = await fetchBingImage(q);
+		const url = await fetchSerperImage(q);
 
 		if (!url) {
 			return NextResponse.json(

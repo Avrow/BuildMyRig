@@ -5,6 +5,7 @@ import { Search, RefreshCw, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NewsModal from "@/components/NewsModal";
+import Navbar from "@/components/Navbar";
 
 const NEWS_CATEGORIES = [
 	"All",
@@ -169,9 +170,11 @@ function NewsPageContent() {
 	};
 
 	return (
-		<div className="min-h-screen bg-background">
+		<>
+			<Navbar />
+			<div className="min-h-screen bg-background">
 			{/* Header */}
-			<div className="border-b border-border bg-card sticky top-0 z-40">
+				<div className="border-b border-border bg-card sticky top-16 z-40">
 				<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 					<div className="mb-6">
 						<h1 className="text-3xl font-bold text-foreground sm:text-4xl">
@@ -224,7 +227,7 @@ function NewsPageContent() {
 			</div>
 
 			{/* Category Filters */}
-			<div className="border-b border-border bg-background sticky top-20 z-30">
+			<div className="border-b border-border bg-background sticky top-80 z-30">
 				<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-2 mb-3 sm:mb-0">
 						<Filter className="h-4 w-4 text-muted-foreground" />
@@ -310,7 +313,8 @@ function NewsPageContent() {
 					setSelectedNews(null);
 				}}
 			/>
-		</div>
+			</div>
+		</>
 	);
 }
 

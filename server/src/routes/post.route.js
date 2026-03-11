@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { createBuildPost } from "../controller/post.controller.js";
+import { createBuildPost, getAllBuildPosts } from "../controller/post.controller.js";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-	res.json(generateMockNews(5));
-});
+// fetch all build posts (used by future api clients)
+router.get("/", getAllBuildPosts);
 
 router.post("/", createBuildPost);
 

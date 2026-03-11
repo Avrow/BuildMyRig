@@ -18,3 +18,13 @@ export async function createBuildPost(req, res) {
 		return res.status(500).json({ error: "Failed to save your build. Please try again." });
 	}
 }
+
+export async function getAllBuildPosts(req, res) {
+	try {
+		const posts = await BuildPost.find({}).sort({ createdAt: -1 }).lean();
+		res.json({ success: true, data: posts });
+	} catch (err) {
+		console.error("[getAllBuildPosts]", err);
+		res.status(500).json({ error: "Failed to load build posts." });
+	}
+}

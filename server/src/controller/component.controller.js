@@ -5,7 +5,7 @@ import Component from "../models/Component.js";
 import { fetchSerperImage } from "../lib/serper.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = resolve(__dirname, "../../pc-part-dataset-main/data/csv/json");
+const DATA_DIR = resolve(__dirname, "../../pc_component_data");
 
 // Maps Component.type → JSON filename
 const TYPE_TO_FILE = {

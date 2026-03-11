@@ -4,7 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store } from "lucide-react";
+import {
+	LogOut,
+	LayoutDashboard,
+	Menu,
+	X,
+	Loader2,
+	Zap,
+	Store,
+	Users,
+	Cpu,
+	PackageOpen,
+	Newspaper,
+} from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -34,7 +46,11 @@ export default function Navbar() {
 
 	const navLinks = [
 		{ href: "/shop-finder", label: "Shop Finder", icon: Store },
-		...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : [])
+		{ href: "/components", label: "Components", icon: Cpu },
+		{ href: "/vault", label: "Vault", icon: PackageOpen },
+		{ href: "/community", label: "Community", icon: Users },
+		{ href: "/news", label: "News", icon: Newspaper },
+		...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : []),
 	];
 
 	return (

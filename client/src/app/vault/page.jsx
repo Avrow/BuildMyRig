@@ -48,7 +48,7 @@ async function enrichWithImages(components) {
 			if (imageUrl) {
 				// Persist asynchronously – don't block the render on this
 				fetch(`${API_URL}/api/components/${c._id}/image`, {
-					method: "PUT",
+					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ imageUrl }),
 				}).catch(() => {});

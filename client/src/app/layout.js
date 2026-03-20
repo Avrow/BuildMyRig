@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-	title: "MyApp",
+	title: "BuildMyRig",
 	description: "A modern full-stack application",
 };
 

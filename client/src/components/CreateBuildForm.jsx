@@ -16,14 +16,20 @@ import {
 	DialogTitle,
 	DialogDescription,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/context/auth";
 
 export default function CreateBuildForm() {
+	const { user } = useAuth();
 	const formRef = useRef(null);
 	const [open, setOpen] = useState(false);
 	const [imageUrl, setImageUrl] = useState("");
 	const [localPreview, setLocalPreview] = useState("");
 	const [uploading, setUploading] = useState(false);
 	const [isPending, setIsPending] = useState(false);
+
+	if (!user) {
+		return null;
+	}
 
 	function handleClose() {
 		if (isPending || uploading) return;
@@ -97,7 +103,7 @@ export default function CreateBuildForm() {
 					</DialogHeader>
 
 					<form
-					  ref={formRef}
+						ref={formRef}
 						onSubmit={handleSubmit}
 						className='space-y-5 pt-2'
 					>

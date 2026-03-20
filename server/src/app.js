@@ -6,7 +6,8 @@ import cors from "cors";
 import authRoute from "./routes/auth.route.js";
 import componentRoute from "./routes/component.route.js";
 import newsRouter from "./routes/news.route.js";
-import commentRouter from "./routes/comment.route.js";
+import aiBuildMatcherRouter from "./routes/ai-build-matcher.route.js";
+//import commentRouter from "./routes/comment.route.js";
 import postRouter from "./routes/post.route.js";
 
 const app = express();
@@ -36,11 +37,14 @@ app.use("/api/components", componentRoute);
 
 app.use("/api/posts", postRouter);
 
+// done: add AI Build Matcher route
+app.use("/api/ai-build-matcher", aiBuildMatcherRouter);
+
 // todo: new
 app.use("/api/news", newsRouter);
 
 // todo: new
-app.use("/api/comments", commentRouter);
+//app.use("/api/comments", commentRouter);
 
 // Fallback route for undefined endpoints
 app.use("/", (req, res) => {

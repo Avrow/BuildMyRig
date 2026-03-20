@@ -3,7 +3,7 @@ dotenv.config();
 import app from "./app.js";
 import connectDB from "./db/connect.js";
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
 	await connectDB();

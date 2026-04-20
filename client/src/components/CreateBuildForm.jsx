@@ -1,268 +1,218 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Loader2, X, Plus, ImageIcon } from "lucide-react";
+import { useRef, useState, useMemo } from "react";
+import { Loader2, X, Plus, ImageIcon, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { UploadDropzone } from "@/utils/uploadthing";
-import { createBuildPost } from "@/app/actions/buildPost";
+import { UploadButton } from "@/utils/uploadthing";
+import { createBuildPost } from "@/app/actions/buildPost"; 
+import { useAuth } from "@/context/auth"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
-import { useAuth } from "@/context/auth";
 
 export default function CreateBuildForm() {
-	const { user } = useAuth();
-	const formRef = useRef(null);
-	const [open, setOpen] = useState(false);
-	const [imageUrl, setImageUrl] = useState("");
-	const [localPreview, setLocalPreview] = useState("");
-	const [uploading, setUploading] = useState(false);
-	const [isPending, setIsPending] = useState(false);
+    const { user } = useAuth();
+    const formRef = useRef(null);
+    const [open, setOpen] = useState(false);
+    const [imageUrl, setImageUrl] = useState("");
+    const [description, setDescription] = useState(""); // এটি মিসিং ছিল
+    const [uploading, setUploading] = useState(false);
+    const [isPending, setIsPending] = useState(false);
 
-	if (!user) {
-		return null;
-	}
+    const wordCount = useMemo(() => {
+        return description.trim().split(/\s+/).filter((word) => word.length > 0).length;
+    }, [description]);
 
-	function handleClose() {
-		if (isPending || uploading) return;
-		setOpen(false);
-		setImageUrl("");
-		if (localPreview) URL.revokeObjectURL(localPreview);
-		setLocalPreview("");
-		formRef.current?.reset();
-	}
+    const isTooLong = wordCount > 1500;
 
-	async function handleSubmit(e) {
-		e.preventDefault();
+    function handleClose() {
+        if (isPending || uploading) return;
+        setOpen(false);
+        setImageUrl("");
+        setDescription("");
+        formRef.current?.reset();
+    }
 
-		if (!imageUrl) {
-			toast.error("Please upload a photo of your build first.");
-			return;
-		}
+    async function handleSubmit(e) {
+        e.preventDefault();
 
-		const formData = new FormData(e.currentTarget);
-		setIsPending(true);
+        if (!user?._id) {
+            toast.error("You must be logged in to post!");
+            return;
+        }
 
-		try {
-			const result = await createBuildPost({
-				imageUrl,
-				caption: formData.get("caption"),
-				cpu: formData.get("cpu"),
-				gpu: formData.get("gpu"),
-				ram: formData.get("ram"),
-			});
+        if (!imageUrl) {
+            toast.error("Please upload your build photo first.");
+            return;
+        }
 
-			if (result?.error) throw new Error(result.error);
+        if (isTooLong) {
+            toast.error("Description is too long! Max 1500 words.");
+            return;
+        }
 
-			toast.success("Build posted! 🎉");
-			handleClose();
-		} catch (err) {
-			toast.error(err.message || "Something went wrong. Please try again.");
-		} finally {
-			setIsPending(false);
-		}
-	}
+        const formData = new FormData(e.currentTarget);
+        setIsPending(true);
 
-	return (
-		<>
-			{/* ── Trigger button ── */}
-			<Button
-				onClick={() => setOpen(true)}
-				className='gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25'
-			>
-				<Plus className='h-4 w-4' />
-				Share Your Build
-			</Button>
+        try {
+            const result = await createBuildPost({
+                author: user._id,
+                imageUrl,
+                caption: formData.get("caption"),
+                cpu: formData.get("cpu"),
+                gpu: formData.get("gpu"),
+                ram: formData.get("ram"),
+                description: description, 
+            });
 
-			{/* ── Dialog ── */}
-			<Dialog
-				open={open}
-				onOpenChange={(v) => {
-					if (!v) handleClose();
-				}}
-			>
-				<DialogContent className='max-w-lg max-h-[90vh] overflow-y-auto'>
-					<DialogHeader>
-						<div className='flex items-center gap-2 mb-1'>
-							<div className='flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-indigo-600'>
-								<ImageIcon className='h-4 w-4 text-white' />
-							</div>
-							<DialogTitle>Share Your Build</DialogTitle>
-						</div>
-						<DialogDescription>
-							Upload a photo, add your specs, and inspire the community.
-						</DialogDescription>
-					</DialogHeader>
+            if (result?.error) throw new Error(result.error);
 
-					<form
-						ref={formRef}
-						onSubmit={handleSubmit}
-						className='space-y-5 pt-2'
-					>
-						{/* ── Image upload / preview ── */}
-						<div className='space-y-2'>
-							<Label>Build Photo</Label>
+            toast.success("Build published successfully! 🎉");
+            handleClose();
+            window.location.reload(); 
+        } catch (err) {
+            toast.error(err.message || "Failed to post.");
+        } finally {
+            setIsPending(false);
+        }
+    }
 
-							{/* Show preview as soon as a file is chosen (local blob or CDN URL) */}
-							{localPreview || imageUrl ? (
-								<div className='relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700'>
-									<img
-										src={localPreview || imageUrl}
-										alt='Build preview'
-										className='w-full h-52 object-cover'
-									/>
-									{/* Uploading overlay */}
-									{uploading && (
-										<div className='absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-2'>
-											<Loader2 className='h-6 w-6 animate-spin text-white' />
-											<span className='text-xs text-white font-medium'>
-												Uploading…
-											</span>
-										</div>
-									)}
-									{/* Remove button — only when not uploading */}
-									{!uploading && (
-										<button
-											type='button'
-											onClick={() => {
-												setImageUrl("");
-												if (localPreview) URL.revokeObjectURL(localPreview);
-												setLocalPreview("");
-											}}
-											className='absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-colors'
-											aria-label='Remove image'
-										>
-											<X className='h-4 w-4' />
-										</button>
-									)}
-								</div>
-							) : (
-								<UploadDropzone
-									endpoint='imageUploader'
-									onBeforeUploadBegin={(files) => {
-										// Show local preview immediately on file selection
-										const blob = URL.createObjectURL(files[0]);
-										setLocalPreview(blob);
-										setUploading(true);
-										return files;
-									}}
-									onClientUploadComplete={(res) => {
-										const url = res?.[0]?.ufsUrl ?? res?.[0]?.url;
-										if (url) {
-											setImageUrl(url);
-											setUploading(false);
-											toast.success("Image uploaded!");
-										}
-									}}
-									onUploadError={(error) => {
-										if (localPreview) URL.revokeObjectURL(localPreview);
-										setLocalPreview("");
-										setUploading(false);
-										toast.error(`Upload failed: ${error.message}`);
-									}}
-									className='border-slate-200 dark:border-slate-700 ut-label:text-slate-700 dark:ut-label:text-slate-200 ut-allowed-content:text-slate-400 ut-button:bg-blue-600 ut-button:hover:bg-blue-700'
-								/>
-							)}
-						</div>
+    if (!user) return null;
 
-						{/* ── Caption ── */}
-						<div className='space-y-1.5'>
-							<Label htmlFor='caption'>Caption</Label>
-							<Input
-								id='caption'
-								name='caption'
-								placeholder='My dream battlestation...'
-								maxLength={280}
-								required
-							/>
-						</div>
+    return (
+        <>
+            <Button
+                onClick={() => setOpen(true)}
+                className='gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+            >
+                <Plus className='h-4 w-4' />
+                Share Your Build
+            </Button>
 
-						{/* ── PC Specs ── */}
-						<div className='space-y-3'>
-							<p className='text-sm font-medium text-slate-700 dark:text-slate-300'>
-								PC Specs
-							</p>
+            <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
+                <DialogContent className='max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950'>
+                    <DialogHeader>
+                        <div className='flex items-center gap-2 mb-1'>
+                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 shadow-md'>
+                                <ImageIcon className='h-4 w-4 text-white' />
+                            </div>
+                            <DialogTitle>Share Your Build Showcase</DialogTitle>
+                        </div>
+                        <DialogDescription>
+                            Sharing as <span className="font-bold text-blue-600">{user?.name || "Guest"}</span>. Maximum 1500 words story.
+                        </DialogDescription>
+                    </DialogHeader>
 
-							<div className='space-y-1.5'>
-								<Label
-									htmlFor='cpu'
-									className='text-xs text-slate-500 uppercase tracking-wide'
-								>
-									CPU
-								</Label>
-								<Input
-									id='cpu'
-									name='cpu'
-									placeholder='AMD Ryzen 9 7950X'
-									required
-									className='text-sm'
-								/>
-							</div>
+                    <form ref={formRef} onSubmit={handleSubmit} className='space-y-5 pt-2'>
+                        {/* Image Upload Area */}
+                        <div className='space-y-2'>
+                            <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Build Photo</Label>
+                            {imageUrl ? (
+                                <div className='relative rounded-2xl overflow-hidden border-2 border-blue-100 group'>
+                                    <img src={imageUrl} alt='Build preview' className='w-full h-52 object-cover' />
+                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                        <button type='button' onClick={() => setImageUrl("")} className='bg-red-500 rounded-full p-2 hover:scale-110 transition-transform'>
+                                            <X className='h-5 w-5' />
+                                        </button>
+                                    </div>
+                                    <div className="absolute bottom-2 left-2 bg-green-500 text-white text-[10px] px-2 py-1 rounded-md flex items-center gap-1 font-bold shadow-lg">
+                                        <CheckCircle2 size={12} /> READY TO POST
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-8 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                                    <UploadButton
+                                        endpoint="imageUploader"
+                                        onUploadProgress={() => setUploading(true)}
+                                        onClientUploadComplete={(res) => {
+                                            const url = res?.[0]?.ufsUrl || res?.[0]?.url;
+                                            setImageUrl(url);
+                                            setUploading(false);
+                                            toast.success("Image uploaded!");
+                                        }}
+                                        onUploadError={(error) => {
+                                            setUploading(false);
+                                            toast.error(`Upload Error: ${error.message}`);
+                                        }}
+                                        appearance={{
+                                            button: "bg-blue-600 hover:bg-blue-700 transition-all font-bold text-sm h-10 px-6",
+                                            allowedContent: "text-slate-400 text-[10px] uppercase mt-2 font-medium"
+                                        }}
+                                    />
+                                    {uploading && (
+                                        <div className="mt-4 flex items-center gap-2 text-blue-600 font-bold text-xs animate-pulse">
+                                            <Loader2 size={14} className="animate-spin" /> SENDING TO CLOUD...
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
 
-							<div className='space-y-1.5'>
-								<Label
-									htmlFor='gpu'
-									className='text-xs text-slate-500 uppercase tracking-wide'
-								>
-									GPU
-								</Label>
-								<Input
-									id='gpu'
-									name='gpu'
-									placeholder='NVIDIA GeForce RTX 4090'
-									required
-									className='text-sm'
-								/>
-							</div>
+                        {/* Specs Grid */}
+                        <div className='grid grid-cols-3 gap-3'>
+                            <div className="space-y-1">
+                                <Label className="text-[10px] font-black uppercase text-slate-400">CPU</Label>
+                                <Input name="cpu" placeholder="e.g. i9 14900K" required className="dark:bg-slate-900" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-[10px] font-black uppercase text-slate-400">GPU</Label>
+                                <Input name="gpu" placeholder="e.g. RTX 4090" required className="dark:bg-slate-900" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-[10px] font-black uppercase text-slate-400">RAM</Label>
+                                <Input name="ram" placeholder="e.g. 64GB" required className="dark:bg-slate-900" />
+                            </div>
+                        </div>
 
-							<div className='space-y-1.5'>
-								<Label
-									htmlFor='ram'
-									className='text-xs text-slate-500 uppercase tracking-wide'
-								>
-									RAM
-								</Label>
-								<Input
-									id='ram'
-									name='ram'
-									placeholder='64 GB DDR5 6000 MHz'
-									required
-									className='text-sm'
-								/>
-							</div>
-						</div>
+                        <div className="space-y-1">
+                            <Label className="text-[10px] font-black uppercase text-slate-400">Build Caption</Label>
+                            <Input name="caption" placeholder="Give your setup a cool name..." required className="dark:bg-slate-900" />
+                        </div>
 
-						{/* ── Submit ── */}
-						<Button
-							type='submit'
-							disabled={isPending || uploading}
-							className='w-full bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold'
-						>
-							{isPending ? (
-								<>
-									<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-									Posting...
-								</>
-							) : uploading ? (
-								<>
-									<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-									Uploading image...
-								</>
-							) : (
-								"Post Build"
-							)}
-						</Button>
-					</form>
-				</DialogContent>
-			</Dialog>
-		</>
-	);
+                        {/* Narrative / Story */}
+                        <div className='space-y-2'>
+                            <div className='flex justify-between items-center'>
+                                <Label className="flex items-center gap-1 font-bold dark:text-slate-300"><FileText size={14} className="text-blue-500" /> Build Narrative</Label>
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isTooLong ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                                    {wordCount} / 1500 WORDS
+                                </span>
+                            </div>
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Describe your choice of parts and the story behind your rig..."
+                                className={`w-full min-h-[140px] p-3 text-sm rounded-xl border outline-none transition-all dark:bg-slate-900 ${isTooLong ? 'border-red-500 focus:ring-4 focus:ring-red-50 text-red-700' : 'border-slate-200 focus:ring-4 focus:ring-blue-50 dark:border-slate-800'}`}
+                                required
+                            />
+                            {isTooLong && (
+                                <p className="text-[10px] text-red-500 font-black flex items-center gap-1">
+                                    <AlertCircle size={12} /> RED ALERT: Description is too long.
+                                </p>
+                            )}
+                        </div>
+
+                        <Button 
+                            type='submit' 
+                            disabled={isPending || uploading || isTooLong} 
+                            className={`w-full py-7 font-black uppercase tracking-widest transition-all rounded-xl shadow-lg ${isTooLong ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 text-white'}`}
+                        >
+                            {isPending ? (
+                                <><Loader2 className="mr-2 animate-spin" /> Publishing...</>
+                            ) : (
+                                "Post Build to Community"
+                            )}
+                        </Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
 }

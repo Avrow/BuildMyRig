@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    getAllShops,
+    getShops,
     getShopById,
     createShop,
     updateShop,
@@ -11,7 +11,7 @@ const router = express.Router();
 
 // GET /api/shops - Get all shops with optional area filtering
 // GET /api/shops?area=Sutrapur - Filter shops by area
-router.get("/", getAllShops);
+router.get("/", getShops);
 
 // GET /api/shops/:id - Get single shop by ID
 router.get("/:id", getShopById);

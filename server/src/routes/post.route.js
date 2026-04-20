@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { createBuildPost, getAllBuildPosts } from "../controller/post.controller.js";
+import { createBuildPost, getAllBuildPosts, getPostById } from "../controller/post.controller.js";
 
 const router = Router();
 
-// fetch all build posts (used by future api clients)
+// Routes definition
 router.get("/", getAllBuildPosts);
-
+router.get("/:id", getPostById); 
 router.post("/", createBuildPost);
 
 export default router;

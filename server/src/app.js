@@ -6,22 +6,19 @@ import cors from "cors";
 import authRoute from "./routes/auth.route.js";
 import componentRoute from "./routes/component.route.js";
 import newsRouter from "./routes/news.route.js";
-import aiBuildMatcherRouter from "./routes/ai-build-matcher.route.js";
-//import commentRouter from "./routes/comment.route.js";
 import postRouter from "./routes/post.route.js";
 import productRouter from "./routes/product.route.js";
+import reviewRouter from "./routes/review.route.js";
+import shopRoute from "./routes/shop.route.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-	cors({
-		origin: process.env.CLIENT_URL || "http://localhost:3000",
-		credentials: true,
-	}),
-);
-
+app.use(cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"], 
+    credentials: true,
+}));
 // Health check endpoint
 app.get("/", (req, res) => {
 	res.send("Hello from PC Builds API!");
@@ -38,16 +35,16 @@ app.use("/api/components", componentRoute);
 
 app.use("/api/posts", postRouter);
 
-// done: add AI Build Matcher route
-app.use("/api/ai-build-matcher", aiBuildMatcherRouter);
-
 // todo: new
 app.use("/api/news", newsRouter);
 
 app.use("/api", productRouter);
 
 // todo: new
-//app.use("/api/comments", commentRouter);
+app.use("/api/reviews", reviewRouter);
+// Add shop routes
+app.use("/api/shops", shopRoute);
+// TODO: add user route
 
 app.use((error, req, res, next) => {
 	console.error("[server-error]", error);
@@ -55,7 +52,7 @@ app.use((error, req, res, next) => {
 });
 
 // Fallback route for undefined endpoints
-app.use("/", (req, res) => {
+app.use((req, res) => {
 	res.status(404).json({ error: "This route does not exist" });
 });
 

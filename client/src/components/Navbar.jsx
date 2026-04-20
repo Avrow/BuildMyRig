@@ -17,6 +17,7 @@ import {
 	PackageOpen,
 	Newspaper,
 	Sparkles,
+	Calculator,
 } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
@@ -48,6 +49,7 @@ export default function Navbar() {
 
 	const navLinks = [
 		{ href: "/shop-finder", label: "Shop Finder", icon: Store },
+		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
 		{ href: "/components", label: "Components", icon: Cpu },
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
 		// { href: "/vault", label: "Vault", icon: PackageOpen },

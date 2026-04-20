@@ -6,7 +6,7 @@ import {
 	addToCookies,
 } from "../utils/jwt.js";
 import { findUserByEmail, createUser } from "../service/user.service.js";
-//Register
+
 export async function registerUser(req, res) {
 	const { name, email, password } = req.body;
 
@@ -32,7 +32,7 @@ export async function registerUser(req, res) {
 		.status(201)
 		.json({ message: "User registered successfully", user });
 }
-//login
+
 export async function loginUser(req, res) {
 	const { email, password } = req.body;
 
@@ -59,7 +59,7 @@ export async function loginUser(req, res) {
 	const { password: _, ...user } = existingUser.toObject();
 	return res.status(200).json({ message: "Login successful", user });
 }
-//logout
+
 export async function logoutUser(req, res) {
 	res.clearCookie("token", {
 		secure: process.env.NODE_ENV === "production",

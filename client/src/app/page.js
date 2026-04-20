@@ -64,7 +64,7 @@ export default function LandingPage() {
 						className='mb-6 inline-flex gap-1.5 rounded-full px-4 py-1 text-sm font-medium'
 					>
 						<Zap className='h-3.5 w-3.5 text-blue-500' />
-						{/*Full-stack Next.js + Express starter*/}
+						Full-stack Next.js + Express starter
 					</Badge>
 
 					<h1 className='mx-auto max-w-3xl text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight'>

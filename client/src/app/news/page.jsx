@@ -86,6 +86,7 @@ function NewsPageContent() {
 	const [news, setNews] = useState([]);
 	const [filteredNews, setFilteredNews] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [fetchError, setFetchError] = useState(null);
 	const [selectedCategory, setSelectedCategory] = useState("All");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedNews, setSelectedNews] = useState(null);
@@ -96,6 +97,7 @@ function NewsPageContent() {
 	// Fetch news
 	const fetchNews = async () => {
 		try {
+			setFetchError(null);
 			setRefreshing(true);
 			const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/news`);
 
@@ -107,13 +109,23 @@ function NewsPageContent() {
 			}
 
 			const response = await fetch(url);
-			if (!response.ok) throw new Error("Failed to fetch news");
+			const data = await response.json().catch(() => null);
 
-			const data = await response.json();
+			if (!response.ok || !data?.success) {
+				throw new Error(
+					data?.error ||
+						"Unable to load news right now. Please try again in a moment.",
+				);
+			}
+
 			setNews(data.data || []);
 			setLastRefresh(new Date().toLocaleTimeString());
 		} catch (error) {
 			console.error("Error fetching news:", error);
+			setFetchError(
+				error?.message ||
+					"Unable to load news right now. Please check your server logs.",
+			);
 		} finally {
 			setRefreshing(false);
 			setLoading(false);
@@ -263,6 +275,21 @@ function NewsPageContent() {
 								className="h-64 animate-pulse rounded-lg bg-muted"
 							/>
 						))}
+					</div>
+				) : fetchError ? (
+					<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-12 text-center">
+						<h3 className="text-lg font-semibold text-foreground">
+							Unable to load news
+						</h3>
+						<p className="mt-2 text-muted-foreground">{fetchError}</p>
+						<Button
+							onClick={handleRefresh}
+							variant="outline"
+							className="mt-4 gap-2"
+						>
+							<RefreshCw className="h-4 w-4" />
+							Try Again
+						</Button>
 					</div>
 				) : filteredNews.length > 0 ? (
 					<>

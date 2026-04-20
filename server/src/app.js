@@ -9,6 +9,7 @@ import newsRouter from "./routes/news.route.js";
 import aiBuildMatcherRouter from "./routes/ai-build-matcher.route.js";
 //import commentRouter from "./routes/comment.route.js";
 import postRouter from "./routes/post.route.js";
+import productRouter from "./routes/product.route.js";
 
 const app = express();
 
@@ -43,8 +44,15 @@ app.use("/api/ai-build-matcher", aiBuildMatcherRouter);
 // todo: new
 app.use("/api/news", newsRouter);
 
+app.use("/api", productRouter);
+
 // todo: new
 //app.use("/api/comments", commentRouter);
+
+app.use((error, req, res, next) => {
+	console.error("[server-error]", error);
+	res.status(500).json({ error: "Something went wrong" });
+});
 
 // Fallback route for undefined endpoints
 app.use("/", (req, res) => {

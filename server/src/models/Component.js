@@ -33,12 +33,41 @@ const componentSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.Mixed,
 			default: {},
 		},
+		// Price data from multiple sources
+		prices: [
+			{
+				source: {
+					type: String,
+					enum: ["ryans", "startech"],
+					required: true,
+				},
+				price: {
+					type: Number,
+					required: true,
+					min: [0, "Price cannot be negative"],
+				},
+				url: {
+					type: String,
+					default: null,
+				},
+				lastUpdated: {
+					type: Date,
+					default: Date.now,
+				},
+			},
+		],
+		// Legacy single price field (for backward compatibility)
 		price: {
 			type: Number,
 			default: null,
 			min: [0, "Price cannot be negative"],
 		},
-		// Populated lazily by the Bing Image Search API on first view
+		// Track when price data was last updated
+		lastPriceUpdate: {
+			type: Date,
+			default: null,
+		},
+		// Populated lazily by the Serper Image Search API on first view
 		imageUrl: {
 			type: String,
 			default: null,

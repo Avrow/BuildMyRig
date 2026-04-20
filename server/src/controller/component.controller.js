@@ -3,6 +3,10 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import Component from "../models/Component.js";
 import { fetchSerperImage } from "../lib/serper.js";
+import {
+	getComponentPrice,
+	getComponentsPrices,
+} from "../service/componentPriceService.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../../pc_component_data");
@@ -184,5 +188,51 @@ export async function updateComponentImage(req, res) {
 	} catch (err) {
 		console.error("[updateComponentImage]", err);
 		res.status(500).json({ error: "Failed to update image URL" });
+	}
+}
+
+/**
+ * GET /api/components/price?name=<component_name>
+ * Smart component price lookup with 24-hour cache validation.
+ * Returns cached price if fresh, otherwise scrapes ryans.com & startech.com.bd
+ */
+export async function getComponentPriceHandler(req, res) {
+	try {
+		const { name } = req.query;
+
+		if (!name || typeof name !== "string") {
+			return res
+				.status(400)
+				.json({ error: "Component name query parameter is required" });
+		}
+
+		const result = await getComponentPrice(name);
+		return res.status(200).json(result);
+	} catch (err) {
+		console.error("[getComponentPrice]", err);
+		return res.status(500).json({ error: err.message });
+	}
+}
+
+/**
+ * POST /api/components/prices
+ * Batch query for multiple components.
+ * Body: { names: ["Component1", "Component2", ...] }
+ */
+export async function getComponentsPricesHandler(req, res) {
+	try {
+		const { names } = req.body;
+
+		if (!Array.isArray(names) || names.length === 0) {
+			return res.status(400).json({
+				error: "Request body must contain an array of component names",
+			});
+		}
+
+		const results = await getComponentsPrices(names);
+		return res.status(200).json(results);
+	} catch (err) {
+		console.error("[getComponentsPrices]", err);
+		return res.status(500).json({ error: err.message });
 	}
 }

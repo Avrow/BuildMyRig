@@ -69,7 +69,7 @@ export default function Navbar() {
 					<div className='flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-indigo-600'>
 						<Zap className='h-4 w-4 text-white' />
 					</div>
-					<span>MyApp</span>
+					<span>BuildMyRig</span>
 				</Link>
 
 				{/* Desktop nav */}

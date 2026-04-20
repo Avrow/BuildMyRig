@@ -299,7 +299,7 @@ export default function ComponentsPage() {
 				// Persist to DB if component has a real _id
 				if (component._id) {
 					fetch(`${API_URL}/api/components/${component._id}/image`, {
-						method: "PUT",
+						method: "PATCH",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({ imageUrl: url }),
 						credentials: "include",

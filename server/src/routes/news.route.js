@@ -1,16 +1,25 @@
 import { Router } from "express";
 import axios from "axios";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 
-dotenv.config();
+// dotenv.config();
 const router = Router();
 
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 
 // Map of news sources for specific categories
 const categoryQueries = {
-	"PC Components & Prices": ["GPU price", "CPU price", "RAM price", "gaming PC"],
-	"Software News": ["software update", "programming language", "developer news"],
+	"PC Components & Prices": [
+		"GPU price",
+		"CPU price",
+		"RAM price",
+		"gaming PC",
+	],
+	"Software News": [
+		"software update",
+		"programming language",
+		"developer news",
+	],
 	"Tech Discoveries": [
 		"tech innovation",
 		"new technology",
@@ -21,7 +30,7 @@ const categoryQueries = {
 };
 
 const fetchNewsFromAPI = async (query) => {
-	console.log(NEWSAPI_KEY)
+	console.log(NEWSAPI_KEY);
 	try {
 		const response = await axios.get("https://newsapi.org/v2/everything", {
 			params: {
@@ -67,10 +76,7 @@ const getNewsByCategory = async () => {
 		const uniqueNews = Array.from(
 			new Map(
 				allNews
-					.sort(
-						(a, b) =>
-							new Date(b.publishedAt) - new Date(a.publishedAt),
-					)
+					.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
 					.map((item) => [item.title, item]),
 			).values(),
 		);

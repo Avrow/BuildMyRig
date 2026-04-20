@@ -38,3 +38,17 @@ export const authApi = {
 
 	refresh: () => apiFetch("/api/auth/refresh", { method: "POST" }),
 };
+
+export const aiApi = {
+	generateBuildMatch: (budget, useCase, targetResolution, preferredBrands = [], extraNotes = "") =>
+		apiFetch("/api/ai-build-matcher", {
+			method: "POST",
+			body: JSON.stringify({
+				budget,
+				useCase,
+				targetResolution,
+				preferredBrands,
+				extraNotes,
+			}),
+		}),
+};

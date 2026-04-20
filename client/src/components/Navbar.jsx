@@ -16,6 +16,8 @@ import {
 	Cpu,
 	PackageOpen,
 	Newspaper,
+	Sparkles,
+	Calculator,
 } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
@@ -36,6 +38,7 @@ export default function Navbar() {
 			await logout();
 			toast.success("Signed out successfully");
 			router.push("/");
+			// redirect("/")
 		} catch {
 			toast.error("Failed to sign out");
 		} finally {
@@ -46,11 +49,15 @@ export default function Navbar() {
 
 	const navLinks = [
 		{ href: "/shop-finder", label: "Shop Finder", icon: Store },
+		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
 		{ href: "/components", label: "Components", icon: Cpu },
-		{ href: "/vault", label: "Vault", icon: PackageOpen },
+		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
+		// { href: "/vault", label: "Vault", icon: PackageOpen },
 		{ href: "/community", label: "Community", icon: Users },
 		{ href: "/news", label: "News", icon: Newspaper },
-		...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : []),
+		...(user
+			? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }]
+			: []),
 	];
 
 	return (

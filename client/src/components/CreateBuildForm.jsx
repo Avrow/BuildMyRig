@@ -23,7 +23,7 @@ export default function CreateBuildForm() {
     const formRef = useRef(null);
     const [open, setOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState("");
-    const [description, setDescription] = useState(""); 
+    const [description, setDescription] = useState(""); // এটি মিসিং ছিল
     const [uploading, setUploading] = useState(false);
     const [isPending, setIsPending] = useState(false);
 
@@ -63,9 +63,8 @@ export default function CreateBuildForm() {
         setIsPending(true);
 
         try {
-            // save build post to db
             const result = await createBuildPost({
-                author: user._id, // user ID given by auth context
+                author: user._id,
                 imageUrl,
                 caption: formData.get("caption"),
                 cpu: formData.get("cpu"),
@@ -78,7 +77,6 @@ export default function CreateBuildForm() {
 
             toast.success("Build published successfully! 🎉");
             handleClose();
-            // post successful publish, we can either re-fetch the builds. For simplicity, we'll reload the page here.
             window.location.reload(); 
         } catch (err) {
             toast.error(err.message || "Failed to post.");
@@ -86,6 +84,8 @@ export default function CreateBuildForm() {
             setIsPending(false);
         }
     }
+
+    if (!user) return null;
 
     return (
         <>
@@ -98,7 +98,7 @@ export default function CreateBuildForm() {
             </Button>
 
             <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-                <DialogContent className='max-w-xl max-h-[90vh] overflow-y-auto pointer-events-auto bg-white dark:bg-slate-950'>
+                <DialogContent className='max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950'>
                     <DialogHeader>
                         <div className='flex items-center gap-2 mb-1'>
                             <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 shadow-md'>
@@ -112,7 +112,7 @@ export default function CreateBuildForm() {
                     </DialogHeader>
 
                     <form ref={formRef} onSubmit={handleSubmit} className='space-y-5 pt-2'>
-                        
+                        {/* Image Upload Area */}
                         <div className='space-y-2'>
                             <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Build Photo</Label>
                             {imageUrl ? (
@@ -156,6 +156,7 @@ export default function CreateBuildForm() {
                             )}
                         </div>
 
+                        {/* Specs Grid */}
                         <div className='grid grid-cols-3 gap-3'>
                             <div className="space-y-1">
                                 <Label className="text-[10px] font-black uppercase text-slate-400">CPU</Label>
@@ -176,6 +177,7 @@ export default function CreateBuildForm() {
                             <Input name="caption" placeholder="Give your setup a cool name..." required className="dark:bg-slate-900" />
                         </div>
 
+                        {/* Narrative / Story */}
                         <div className='space-y-2'>
                             <div className='flex justify-between items-center'>
                                 <Label className="flex items-center gap-1 font-bold dark:text-slate-300"><FileText size={14} className="text-blue-500" /> Build Narrative</Label>
@@ -200,7 +202,7 @@ export default function CreateBuildForm() {
                         <Button 
                             type='submit' 
                             disabled={isPending || uploading || isTooLong} 
-                            className={`w-full py-7 font-black uppercase tracking-widest transition-all rounded-xl shadow-lg ${isTooLong ? 'bg-slate-300' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 text-white'}`}
+                            className={`w-full py-7 font-black uppercase tracking-widest transition-all rounded-xl shadow-lg ${isTooLong ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 text-white'}`}
                         >
                             {isPending ? (
                                 <><Loader2 className="mr-2 animate-spin" /> Publishing...</>

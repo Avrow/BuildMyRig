@@ -148,7 +148,7 @@ export async function getComponents(req, res) {
 }
 
 /**
- * PUT /api/components/:id/image
+ * PATCH /api/components/:id/image
  * Body: { imageUrl: string }
  * Persists the image URL once it has been fetched from Serper.
  */

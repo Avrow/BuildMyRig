@@ -8,6 +8,7 @@ import componentRoute from "./routes/component.route.js";
 import newsRouter from "./routes/news.route.js";
 import postRouter from "./routes/post.route.js";
 import reviewRouter from "./routes/review.route.js";
+import shopRoute from "./routes/shop.route.js";
 
 const app = express();
 
@@ -38,9 +39,12 @@ app.use("/api/news", newsRouter);
 
 // todo: new
 app.use("/api/reviews", reviewRouter);
+// Add shop routes
+app.use("/api/shops", shopRoute);
+// TODO: add user route
 
 // Fallback route for undefined endpoints
-app.use("/", (req, res) => {
+app.use((req, res) => {
 	res.status(404).json({ error: "This route does not exist" });
 });
 

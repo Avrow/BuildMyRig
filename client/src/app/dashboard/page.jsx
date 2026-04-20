@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -24,7 +24,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
-import { useState } from "react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+     if (!loading && !user) {
       router.push("/signin");
     }
   }, [user, loading, router]);
@@ -42,7 +41,7 @@ export default function DashboardPage() {
     try {
       await refresh();
       toast.success("Session refreshed successfully");
-    } catch {
+    } catch (err) {
       toast.error("Failed to refresh session. Please sign in again.");
       router.push("/signin");
     } finally {
@@ -50,14 +49,19 @@ export default function DashboardPage() {
     }
   };
 
+  
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <div className="text-center space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto" />
+          <p className="text-slate-500 animate-pulse">Loading your profile...</p>
+        </div>
       </div>
     );
   }
 
+  
   if (!user) return null;
 
   return (
@@ -71,7 +75,7 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="mt-1 text-slate-500">
-            Welcome back, {user.name || "there"}!
+            Welcome back, <span className="font-semibold text-blue-600">{user?.name || "Builder"}</span>!
           </p>
         </div>
 
@@ -87,16 +91,16 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-indigo-600 text-white text-lg font-bold">
-                  {(user.name || user.email)[0].toUpperCase()}
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-lg font-bold shadow-md">
+                  {(user?.name || user?.email || "U")[0].toUpperCase()}
                 </div>
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white">
-                    {user.name || "—"}
+                    {user?.name || "User"}
                   </p>
                   <p className="text-sm text-slate-500 flex items-center gap-1">
                     <Mail className="h-3 w-3" />
-                    {user.email}
+                    {user?.email}
                   </p>
                 </div>
               </div>
@@ -110,7 +114,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">User ID</span>
                 <code className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">
-                  {String(user._id).slice(-8)}
+                  {user?._id ? String(user._id).slice(-8) : "N/A"}
                 </code>
               </div>
             </CardContent>
@@ -139,7 +143,7 @@ export default function DashboardPage() {
               </div>
               <Button
                 variant="outline"
-                className="w-full gap-2"
+                className="w-full gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 onClick={handleRefresh}
                 disabled={refreshing}
               >
@@ -164,14 +168,14 @@ export default function DashboardPage() {
             <CardContent className="space-y-2">
               <Button
                 variant="destructive"
-                className="w-full gap-2 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800"
+                className="w-full gap-2 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 transition-all"
                 onClick={async () => {
                   try {
                     await logout();
-                    toast.success("Signed out");
+                    toast.success("Signed out successfully");
                     router.push("/");
-                  } catch {
-                    toast.error("Sign out failed");
+                  } catch (err) {
+                    toast.error("Sign out failed. Please try again.");
                   }
                 }}
               >

@@ -175,10 +175,10 @@ export default function LandingPage() {
 							<Zap className='h-3.5 w-3.5 text-white' />
 						</div>
 						<span className='font-semibold text-slate-600 dark:text-slate-300'>
-							MyApp
+							BuildMyRig
 						</span>
 					</div>
-					<p>© {new Date().getFullYear()} MyApp. All rights reserved.</p>
+					<p>© {new Date().getFullYear()} BuildMyRig. All rights reserved.</p>
 				</div>
 			</footer>
 		</div>

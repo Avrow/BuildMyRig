@@ -1,43 +1,49 @@
-import Shop from "../models/Shop.js";
+import Shop from "../models/shop.js";
 
-// Get all shops with optional area filtering
-export const getAllShops = async (req, res) => {
+const getShops = async (req, res) => {
     try {
-        const { area } = req.query;
+        const { area, search } = req.query;
         let query = {};
-        
-        if (area) {
-            query.area = { $regex: area, $options: "i" };
+
+        // Filter by area if provided
+        if (area && area !== "All areas") {
+            query.area = area;
         }
-        
+
+        // Search by name or address if provided
+        if (search) {
+            query.$or = [
+                { shopName: { $regex: search, $options: "i" } },
+                { address: { $regex: search, $options: "i" } }
+            ];
+        }
+
         const shops = await Shop.find(query).sort({ createdAt: -1 });
-        
+
         res.status(200).json({
             success: true,
-            count: shops.length,
             data: shops,
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error fetching shops",
-            error: error.message,
+            message: error.message,
         });
     }
 };
 
-// Get single shop by ID
-export const getShopById = async (req, res) => {
+const getShopById = async (req, res) => {
     try {
-        const shop = await Shop.findById(req.params.id);
-        
+        const { id } = req.params;
+        const shop = await Shop.findById(id);
+
         if (!shop) {
             return res.status(404).json({
                 success: false,
                 message: "Shop not found",
             });
         }
-        
+
         res.status(200).json({
             success: true,
             data: shop,
@@ -45,24 +51,22 @@ export const getShopById = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error fetching shop",
-            error: error.message,
+            message: error.message,
         });
     }
 };
 
-// Create new shop (admin only)
-export const createShop = async (req, res) => {
+const createShop = async (req, res) => {
     try {
         const { shopName, area, address, phone, categories, googleMapLink } = req.body;
-        
+
         if (!shopName || !area || !address || !phone) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide shopName, area, address, and phone",
+                message: "Shop name, area, address, and phone are required",
             });
         }
-        
+
         const shop = await Shop.create({
             shopName,
             area,
@@ -71,63 +75,70 @@ export const createShop = async (req, res) => {
             categories: categories || [],
             googleMapLink,
         });
-        
+
         res.status(201).json({
             success: true,
-            message: "Shop created successfully",
             data: shop,
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error creating shop",
-            error: error.message,
+            message: error.message,
         });
     }
 };
 
-// Update shop (admin only)
-export const updateShop = async (req, res) => {
+const updateShop = async (req, res) => {
     try {
-        const shop = await Shop.findByIdAndUpdate(
-            req.params.id,
-            req.body,
+        const { id } = req.params;
+        const { shopName, area, address, phone, categories, googleMapLink, verified } = req.body;
+
+        const shop = await Shop.findById(id);
+        if (!shop) {
+            return res.status(404).json({
+                success: false,
+                message: "Shop not found",
+            });
+        }
+
+        const updatedShop = await Shop.findByIdAndUpdate(
+            id,
+            {
+                shopName,
+                area,
+                address,
+                phone,
+                categories,
+                googleMapLink,
+                verified,
+            },
             { new: true, runValidators: true }
         );
-        
-        if (!shop) {
-            return res.status(404).json({
-                success: false,
-                message: "Shop not found",
-            });
-        }
-        
+
         res.status(200).json({
             success: true,
-            message: "Shop updated successfully",
-            data: shop,
+            data: updatedShop,
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error updating shop",
-            error: error.message,
+            message: error.message,
         });
     }
 };
 
-// Delete shop (admin only)
-export const deleteShop = async (req, res) => {
+const deleteShop = async (req, res) => {
     try {
-        const shop = await Shop.findByIdAndDelete(req.params.id);
-        
+        const { id } = req.params;
+        const shop = await Shop.findByIdAndDelete(id);
+
         if (!shop) {
             return res.status(404).json({
                 success: false,
                 message: "Shop not found",
             });
         }
-        
+
         res.status(200).json({
             success: true,
             message: "Shop deleted successfully",
@@ -135,8 +146,9 @@ export const deleteShop = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error deleting shop",
-            error: error.message,
+            message: error.message,
         });
     }
 };
+
+export { getShops, getShopById, createShop, updateShop, deleteShop };

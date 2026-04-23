@@ -3,29 +3,84 @@
 import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongooseClient";
 import BuildPost from "@/models/buildPost";
+import { moderateImage } from "@/lib/imageModeration"; 
 
 /**
- * Persists a new PC build post to MongoDB.
- *
- * @param {{ imageUrl: string, caption: string, cpu: string, gpu: string, ram: string }} data
- * @returns {{ success: true, id: string } | { error: string }}
+ * new post create
  */
-export async function createBuildPost({ imageUrl, caption, cpu, gpu, ram }) {
-	// Validate required fields on the server to prevent bad data.
-	if (!imageUrl || !caption || !cpu || !gpu || !ram) {
-		return { error: "All fields including an image are required." };
-	}
+export async function createBuildPost({ author, imageUrl, caption, cpu, gpu, ram, description }) {
+    if (!author || !imageUrl || !caption || !cpu || !gpu || !ram || !description) {
+        return { error: "All fields are required." };
+    }
 
-	try {
-		await connectDB();
-		const post = await BuildPost.create({ imageUrl, caption, cpu, gpu, ram });
+    try {
+        const moderation = await moderateImage(imageUrl);
+        if (moderation && moderation.safe === false) {
+            return { error: moderation.error };
+        }
 
-		// Invalidate the community page cache so the new post shows up instantly.
-		revalidatePath("/community");
+        await connectDB();
+        const post = await BuildPost.create({ 
+            author, imageUrl, caption, cpu, gpu, ram, description  
+        });
 
-		return { success: true, id: post._id.toString() };
-	} catch (err) {
-		console.error("[createBuildPost]", err);
-		return { error: "Failed to save your build. Please try again." };
-	}
+        revalidatePath("/community");
+        return { success: true, id: post._id.toString() };
+    } catch (err) {
+        console.error("[createBuildPost Error]", err);
+        return { error: "Failed to save build." };
+    }
+}
+
+/**
+ * post delete (only by author) - permission check included
+ */
+export async function deleteBuildPost(postId, userId) {
+    try {
+        await connectDB();
+        const post = await BuildPost.findById(postId);
+        
+        if (!post) return { error: "Post not found" };
+        
+        // অথেনটিকেশন চেক
+        if (post.author.toString() !== userId) {
+            return { error: "Unauthorized! You can only delete your own posts." };
+        }
+
+        await BuildPost.findByIdAndDelete(postId);
+        revalidatePath("/community");
+        return { success: true };
+    } catch (err) {
+        console.error("[deleteBuildPost Error]", err);
+        return { error: "Failed to delete post." };
+    }
+}
+
+/**
+ * post upload
+ */
+export async function updateBuildPost(postId, userId, updatedData) {
+    try {
+        if (updatedData.imageUrl) {
+            const moderation = await moderateImage(updatedData.imageUrl);
+            if (moderation && moderation.safe === false) {
+                return { error: moderation.error };
+            }
+        }
+
+        await connectDB();
+        const post = await BuildPost.findById(postId);
+        
+        if (!post) return { error: "Post not found" };
+        if (post.author.toString() !== userId) {
+            return { error: "Unauthorized access." };
+        }
+
+        await BuildPost.findByIdAndUpdate(postId, updatedData);
+        revalidatePath("/community");
+        return { success: true };
+    } catch (err) {
+        console.error("[updateBuildPost Error]", err);
+        return { error: "Update failed." };
+    }
 }

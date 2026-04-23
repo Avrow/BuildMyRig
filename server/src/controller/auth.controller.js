@@ -83,6 +83,11 @@ export async function getMe(req, res) {
 		const { password: _, ...userData } = user.toObject();
 		return res.status(200).json({ user: userData });
 	} catch {
+		res.clearCookie("token", {
+			httpOnly: true,
+			sameSite: "lax",
+			secure: process.env.NODE_ENV === "production",
+		});
 		return res.status(401).json({ error: "Invalid or expired token" });
 	}
 }

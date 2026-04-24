@@ -19,5 +19,4 @@ router.delete("/delete/:id", deleteAlert);
 
 // PUT mark component as restocked + send emails
 router.put("/restock", markAsRestocked);
-
 export default router;

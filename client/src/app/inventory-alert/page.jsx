@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Bell, BellOff, Trash2, PackageCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,19 +10,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:1497";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export default function InventoryAlertPage() {
+function InventoryAlertContent() {
+  const searchParams = useSearchParams();
+
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Form state
-  const [componentId, setComponentId] = useState("");
-  const [email, setEmail] = useState("");
-  const [retailerName, setRetailerName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Form state — prefilled if coming from Price Watcher
+  const [componentName, setComponentName] = useState(
+    searchParams.get("componentName") || ""
+  );
+  const [retailerName, setRetailerName] = useState(
+    searchParams.get("retailerName") || ""
+  );
+  const [email, setEmail] = useState("");
 
   // Fetch all alerts
   const fetchAlerts = async () => {
@@ -42,12 +49,33 @@ export default function InventoryAlertPage() {
     fetchAlerts();
   }, []);
 
-  // Set a new alert
+  // Set a new alert using component name
   const handleSetAlert = async () => {
-    if (!componentId || !email || !retailerName) return;
+    if (!componentName || !email || !retailerName) {
+      setError("Please fill in all fields!");
+      return;
+    }
     setSubmitting(true);
     setSuccessMsg("");
+    setError(null);
+
     try {
+      // First find the component by name
+      const searchRes = await fetch(
+        `${API_URL}/api/components?search=${encodeURIComponent(componentName)}&limit=1`
+      );
+      const searchData = await searchRes.json();
+      const components = searchData.components || searchData;
+
+      if (!components || components.length === 0) {
+        setError("Component not found! Please check the name.");
+        setSubmitting(false);
+        return;
+      }
+
+      const componentId = components[0]._id;
+
+      // Now set the alert with the found ID
       const res = await fetch(`${API_URL}/api/inventoryalert/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,8 +83,9 @@ export default function InventoryAlertPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to set alert");
-      setSuccessMsg("✅ Alert set successfully!");
-      setComponentId("");
+
+      setSuccessMsg(`✅ Alert set for "${componentName}" at ${retailerName}!`);
+      setComponentName("");
       setEmail("");
       setRetailerName("");
       fetchAlerts();
@@ -108,30 +137,39 @@ export default function InventoryAlertPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Input
-              placeholder="Component ID"
-              value={componentId}
-              onChange={(e) => setComponentId(e.target.value)}
-              className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-            />
-            <Input
-              placeholder="Your Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-            />
-            <Input
-              placeholder="Retailer Name (e.g. Star Tech)"
-              value={retailerName}
-              onChange={(e) => setRetailerName(e.target.value)}
-              className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-            />
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Component Name</label>
+              <Input
+                placeholder="e.g. Nvidia RTX 4070"
+                value={componentName}
+                onChange={(e) => setComponentName(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Retailer Name</label>
+              <Input
+                placeholder="e.g. Star Tech"
+                value={retailerName}
+                onChange={(e) => setRetailerName(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">Your Email</label>
+              <Input
+                placeholder="you@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+              />
+            </div>
             <Button
               onClick={handleSetAlert}
               disabled={submitting}
               className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
             >
-              {submitting ? "Setting Alert..." : "Set Alert"}
+              {submitting ? "Setting Alert..." : "Set Alert 🔔"}
             </Button>
             {successMsg && (
               <p className="text-green-400 text-sm text-center">{successMsg}</p>
@@ -147,7 +185,7 @@ export default function InventoryAlertPage() {
         {/* ── Active Alerts ── */}
         <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
           <PackageCheck className="h-5 w-5 text-yellow-400" />
-          Active Alerts
+          Active Alerts ({alerts.length})
         </h2>
 
         {loading && (
@@ -171,7 +209,7 @@ export default function InventoryAlertPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm text-white">
-                      {alert.componentId?.name || alert.componentId}
+                      {alert.componentId?.name || "Component"}
                     </CardTitle>
                     {alert.isNotified ? (
                       <Badge className="bg-green-600/20 text-green-400 border-green-600/40 text-xs">
@@ -204,8 +242,15 @@ export default function InventoryAlertPage() {
             ))}
           </div>
         )}
-
       </main>
     </div>
+  );
+}
+
+export default function InventoryAlertPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+      <InventoryAlertContent />
+    </Suspense>
   );
 }

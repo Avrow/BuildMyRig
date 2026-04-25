@@ -12,6 +12,7 @@ import reviewRouter from "./routes/review.route.js";
 import shopRoute from "./routes/shop.route.js";
 import pricewatcherRoute from "./routes/pricewatcher.route.js";
 import inventoryalertRoute from "./routes/inventoryalert.route.js";
+import quoteRoute from "./routes/quoteRoutes.js";
 
 
 
@@ -51,6 +52,7 @@ app.use("/api/shops", shopRoute);
 // TODO: add user route
 app.use("/api/pricewatcher", pricewatcherRoute);
 app.use("/api/inventoryalert", inventoryalertRoute);
+app.use("/api/quotes", quoteRoute);
 
 app.use((error, req, res, next) => {
 	console.error("[server-error]", error);

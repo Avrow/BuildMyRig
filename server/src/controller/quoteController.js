@@ -11,10 +11,17 @@ const createQuote = async (req, res) => {
             });
         }
 
+        // Transform the parts data to match the schema
+        const transformedParts = parts.map(part => ({
+            partName: part.name,
+            category: part.detectedType || 'Unknown',
+            price: part.price || 0,
+        }));
+
         const quote = await Quote.create({
             userId,
             quoteName,
-            parts,
+            parts: transformedParts,
         });
 
         res.status(201).json({

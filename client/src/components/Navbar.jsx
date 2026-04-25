@@ -13,6 +13,7 @@ import {
 	Newspaper,
 	Sparkles,
 	Calculator,
+	ArrowLeftRight,
 } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
@@ -47,6 +48,7 @@ const navLinks = [
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
   		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
 		{ href: "/components", label: "Components", icon: Cpu },
+		{ href: "/spec-compare", label: "Spec Compare", icon: ArrowLeftRight },
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
 		// { href: "/vault", label: "Vault", icon: PackageOpen },
 		{ href: "/community", label: "Community", icon: Users },

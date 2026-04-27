@@ -1,9 +1,44 @@
 import Link from "next/link";
-import { ArrowRight, Zap, ShieldCheck, Cpu, ShoppingCart, MessageSquare } from "lucide-react";
+import { ArrowRight, Zap, ShieldCheck, Cpu, ShoppingCart, MessageSquare, Sparkles, Eye, Bolt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
+
+const features = [
+	{
+		icon: Sparkles,
+		title: "AI Builder",
+		description:
+			"Tell our AI your budget and use case, and it will generate the perfect part list instantly.",
+		color: "text-yellow-500",
+		bg: "bg-yellow-50 dark:bg-yellow-900/20",
+	},
+	{
+		icon: ShieldCheck,
+		title: "Smart Compatibility",
+		description:
+			"Never worry about buying incompatible parts or wrong socket types again.",
+		color: "text-green-500",
+		bg: "bg-green-50 dark:bg-green-900/20",
+	},
+	{
+		icon: Eye,
+		title: "Virtual Build Look",
+		description:
+			"Generate an AI visual mockup of what your completed PC will actually look like.",
+		color: "text-blue-500",
+		bg: "bg-blue-50 dark:bg-blue-900/20",
+	},
+	{
+		icon: Bolt,
+		title: "Accurate Wattage",
+		description:
+			"Automatically calculate system power draw and get smart Power Supply recommendations.",
+		color: "text-violet-500",
+		bg: "bg-violet-50 dark:bg-violet-900/20",
+	},
+];
 
 export default function LandingPage() {
     return (
@@ -47,20 +82,15 @@ export default function LandingPage() {
 						className='mb-6 inline-flex gap-1.5 rounded-full px-4 py-1 text-sm font-medium'
 					>
 						<Zap className='h-3.5 w-3.5 text-blue-500' />
-						Full-stack Next.js + Express starter
+						The Ultimate PC Building Platform
 					</Badge>
 
 					<h1 className='mx-auto max-w-3xl text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight'>
-						Build{" "}
-						<span className='bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent'>
-							faster
-						</span>{" "}
-						with a solid foundation
+						Design your dream rig with confidence
 					</h1>
 
 					<p className='mx-auto mt-6 max-w-xl text-lg sm:text-xl text-slate-500 dark:text-slate-400 leading-relaxed'>
-						A production-ready authentication starter kit. Sign up, sign in,
-						manage sessions — all wired up and ready to go.
+						Plan your custom PC, check part compatibility, and visualize your final build with AI — all in one place.
 					</p>
 
 					<div className='mt-10 flex flex-col sm:flex-row items-center justify-center gap-4'>
@@ -69,8 +99,8 @@ export default function LandingPage() {
 							className='w-full sm:w-auto bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 px-8'
 							asChild
 						>
-							<Link href='/signup'>
-								Get started free <ArrowRight className='ml-2 h-4 w-4' />
+							<Link href='/build-planner'>
+								Start Building <ArrowRight className='ml-2 h-4 w-4' />
 							</Link>
 						</Button>
 						<Button
@@ -90,10 +120,10 @@ export default function LandingPage() {
 				<div className='mx-auto max-w-6xl px-4 sm:px-6'>
 					<div className='text-center mb-16'>
 						<h2 className='text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white'>
-							Everything you need
+							Everything you need to build smarter
 						</h2>
 						<p className='mt-3 text-slate-500 max-w-lg mx-auto'>
-							Authentication, session management, and modern UI — all included.
+							AI guidance, part compatibility checks, visual previews, and wattage planning — all included.
 						</p>
 					</div>
 
@@ -132,18 +162,18 @@ export default function LandingPage() {
 							<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 						</div>
 						<h2 className='relative text-3xl sm:text-4xl font-bold text-white'>
-							Ready to get started?
+							Ready to build your ultimate rig?
 						</h2>
 						<p className='relative mt-3 text-blue-100 max-w-md mx-auto'>
-							Create your account in seconds and explore the dashboard.
+							Join the community and save your custom PC builds today.
 						</p>
 						<Button
 							size='lg'
 							className='relative mt-8 bg-white text-blue-700 hover:bg-blue-50 shadow-lg font-semibold px-10'
 							asChild
 						>
-							<Link href='/signup'>
-								Create free account <ArrowRight className='ml-2 h-4 w-4' />
+							<Link href='/build-planner'>
+								Go to Build Planner <ArrowRight className='ml-2 h-4 w-4' />
 							</Link>
 						</Button>
 					</div>

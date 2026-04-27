@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { Search, RefreshCw, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import NewsModal from "@/components/NewsModal";
 import Navbar from "@/components/Navbar";
@@ -16,7 +15,6 @@ const NEWS_CATEGORIES = [
 	"CPU News",
 ];
 
-// 🔍 Simple category detector
 const detectCategory = (title = "") => {
 	const t = title.toLowerCase();
 
@@ -30,7 +28,6 @@ const detectCategory = (title = "") => {
 	return "Tech Discoveries";
 };
 
-// 🔄 Normalize API response → UI format
 const normalizeArticle = (item) => ({
 	title: item.title || "No title",
 	summary: item.description || "No description available",
@@ -59,40 +56,38 @@ function NewsCard({ article, onClick }) {
 	return (
 		<article
 			onClick={onClick}
-			className='group cursor-pointer overflow-hidden rounded-lg border bg-card hover:shadow-lg transition'
+			className="group cursor-pointer overflow-hidden rounded-lg border bg-card hover:shadow-lg transition"
 		>
-			{/* Image */}
 			{article.imageUrl && (
-				<div className='h-48 overflow-hidden bg-muted'>
+				<div className="h-48 overflow-hidden bg-muted">
 					<img
 						src={article.imageUrl}
 						alt={article.title}
-						className='w-full h-full object-cover group-hover:scale-105 transition'
+						className="w-full h-full object-cover group-hover:scale-105 transition"
 						onError={(e) => {
-							e.target.src = "/fallback.jpg"; // optional fallback
+							e.target.src = "/fallback.jpg";
 						}}
 					/>
 				</div>
 			)}
 
-			{/* Content */}
-			<div className='p-4'>
-				<div className='flex justify-between text-xs mb-2'>
-					<span className='bg-primary/10 px-2 py-1 rounded'>
+			<div className="p-4">
+				<div className="flex justify-between text-xs mb-2">
+					<span className="bg-primary/10 px-2 py-1 rounded">
 						{article.category}
 					</span>
 					<span>{formatDate(article.publishedAt)}</span>
 				</div>
 
-				<h3 className='font-semibold line-clamp-2 mb-2'>{article.title}</h3>
+				<h3 className="font-semibold line-clamp-2 mb-2">{article.title}</h3>
 
-				<p className='text-sm text-muted-foreground line-clamp-2'>
+				<p className="text-sm text-muted-foreground line-clamp-2">
 					{article.summary}
 				</p>
 
-				<div className='flex justify-between mt-3 text-xs'>
+				<div className="flex justify-between mt-3 text-xs">
 					<span>{article.source}</span>
-					<span className='text-primary'>Read →</span>
+					<span className="text-primary">Read →</span>
 				</div>
 			</div>
 		</article>
@@ -108,24 +103,18 @@ function NewsPageContent() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedNews, setSelectedNews] = useState(null);
 
-	// 🚀 Fetch + normalize
 	const fetchNews = async () => {
 		try {
 			setError(null);
 
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/news`);
-
 			const data = await res.json();
 
 			if (!res.ok) throw new Error("Failed to fetch");
 
-			// support BOTH formats
 			const articles = data.data || data.articles || [];
-
-			const normalized = articles.map(normalizeArticle);
-
-			setNews(normalized);
-		} catch (err) {
+			setNews(articles.map(normalizeArticle));
+		} catch {
 			setError("Failed to load news");
 		} finally {
 			setLoading(false);
@@ -136,7 +125,6 @@ function NewsPageContent() {
 		fetchNews();
 	}, []);
 
-	// 🔎 Filter
 	useEffect(() => {
 		let filtered = news;
 
@@ -149,7 +137,7 @@ function NewsPageContent() {
 			filtered = filtered.filter(
 				(n) =>
 					n.title.toLowerCase().includes(q) ||
-					n.summary.toLowerCase().includes(q),
+					n.summary.toLowerCase().includes(q)
 			);
 		}
 
@@ -160,30 +148,30 @@ function NewsPageContent() {
 		<>
 			<Navbar />
 
-			<div className='max-w-7xl mx-auto p-4'>
-				<h1 className='text-3xl font-bold mb-4'>Tech News Hub</h1>
+			<div className="max-w-7xl mx-auto p-4">
+				<h1 className="text-3xl font-bold mb-4">Tech News Hub</h1>
 
-				{/* Search */}
-				<div className='relative mb-4'>
-					<Search className='absolute left-3 top-3 h-4 w-4' />
+				<div className="relative mb-4">
+					<Search className="absolute left-3 top-3 h-4 w-4" />
 					<Input
-						className='pl-10'
-						placeholder='Search...'
+						className="pl-10"
+						placeholder="Search..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 				</div>
 			</div>
 
-			{/* Category Filters */}
+			{/* Sticky Category Filters */}
 			<div className="border-b border-border bg-background sticky top-72 z-30">
 				<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-					<div className="flex items-center gap-2 mb-3 sm:mb-0">
+					<div className="flex items-center gap-2 mb-3">
 						<Filter className="h-4 w-4 text-muted-foreground" />
 						<span className="text-sm font-medium text-foreground">
-							Categories:{" "}
+							Categories:
 						</span>
 					</div>
+
 					<div className="flex flex-wrap gap-2">
 						{NEWS_CATEGORIES.map((category) => (
 							<button
@@ -202,14 +190,14 @@ function NewsPageContent() {
 				</div>
 			</div>
 
-			{/* Main Content */}
+			{/* News Grid */}
 			<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				{loading ? (
 					<p>Loading...</p>
 				) : error ? (
 					<p>{error}</p>
 				) : (
-					<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+					<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{filteredNews.map((article, i) => (
 							<NewsCard
 								key={i}
@@ -221,7 +209,6 @@ function NewsPageContent() {
 				)}
 			</div>
 
-			{/* Modal */}
 			<NewsModal
 				news={selectedNews}
 				isOpen={!!selectedNews}

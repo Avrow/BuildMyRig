@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,21 @@ export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
+
+const navLinks = [
+  { href: "/shop-finder", label: "Shop Finder", icon: Store },
+  { href: "/price-watcher", label: "Price Watcher", icon: Tag },
+  { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
+		{ href: "/build-planner", label: "Build Planner", icon: Wrench },
+  		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
+		{ href: "/components", label: "Components", icon: Cpu },
+		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
+		// { href: "/vault", label: "Vault", icon: PackageOpen },
+		{ href: "/community", label: "Community", icon: Users },
+		{ href: "/news", label: "News", icon: Newspaper },
+		
+  ...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : [])
+];
     const handleLogout = async () => {
         setLoggingOut(true);
         try {
@@ -33,16 +48,7 @@ export default function Navbar() {
     };
 
     // তোমার সেই অরিজিনাল লিঙ্ক লিস্ট, শুধু মার্কেটপ্লেস অ্যাড করা হয়েছে
-    const navLinks = [
-        { href: "/shop-finder", label: "Shop Finder", icon: Store },
-        { href: "/quote-generator", label: "Quote Generator", icon: Calculator },
-        { href: "/components", label: "Components", icon: Cpu },
-        { href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
-        { href: "/community", label: "Community", icon: Users },
-        { href: "/news", label: "News", icon: Newspaper },
-        { href: "/marketplace", label: "Marketplace", icon: Store }, // তোমার চাওয়া নতুন অপশন
-        ...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : []),
-    ];
+
 
     return (
         <header className='sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-slate-950/80 backdrop-blur-md'>

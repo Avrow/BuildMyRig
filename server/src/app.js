@@ -14,6 +14,10 @@ import marketplaceRoute from "./routes/marketplaceRoutes.js";
 import aiBuildMatcherRoute from "./routes/ai-build-matcher.route.js";
 import pricewatcherRoute from "./routes/pricewatcher.route.js";
 import inventoryalertRoute from "./routes/inventoryalert.route.js";
+import buildRoute from "./routes/build.route.js";
+
+
+
 import quoteRoute from "./routes/quoteRoutes.js";
 import marketTrendRoute from "./routes/markettrend.route.js";
 
@@ -45,6 +49,9 @@ app.use("/api/shops", shopRoute);
 // TODO: add user route
 app.use("/api/pricewatcher", pricewatcherRoute);
 app.use("/api/inventoryalert", inventoryalertRoute);
+app.use("/api/builds", buildRoute);
+app.use("/api/ai-build-matcher", aiBuildMatcherRoute);
+
 app.use("/api/quotes", quoteRoute);
 app.use("/api/markettrend", marketTrendRoute);
 

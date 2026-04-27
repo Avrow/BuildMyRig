@@ -52,3 +52,17 @@ export const aiApi = {
 			}),
 		}),
 };
+
+export const buildPlannerApi = {
+	generateVirtualLook: (parts) =>
+		apiFetch("/api/builds/virtual-look", {
+			method: "POST",
+			body: JSON.stringify({ parts }),
+		}),
+
+	saveBuild: (payload) =>
+		apiFetch("/api/builds", {
+			method: "POST",
+			body: JSON.stringify(payload),
+		}),
+};

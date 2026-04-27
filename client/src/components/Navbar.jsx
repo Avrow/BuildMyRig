@@ -29,7 +29,9 @@ const navLinks = [
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
 		// { href: "/vault", label: "Vault", icon: PackageOpen },
 		{ href: "/community", label: "Community", icon: Users },
+        { href: "/marketplace", label: "Marketplace", icon: Users },
 		{ href: "/news", label: "News", icon: Newspaper },
+
 		
   ...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : [])
 ];

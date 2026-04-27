@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongooseClient";
 import BuildPost from "@/models/buildPost";
-import { moderateImage } from "@/lib/imageModeration"; 
 
 /**
  * new post create
@@ -14,10 +13,7 @@ export async function createBuildPost({ author, imageUrl, caption, cpu, gpu, ram
     }
 
     try {
-        const moderation = await moderateImage(imageUrl);
-        if (moderation && moderation.safe === false) {
-            return { error: moderation.error };
-        }
+
 
         await connectDB();
         const post = await BuildPost.create({ 

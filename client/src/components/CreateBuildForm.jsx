@@ -79,6 +79,7 @@ export default function CreateBuildForm() {
             handleClose();
             window.location.reload(); 
         } catch (err) {
+            console.error("Post Build Error:", err);
             toast.error(err.message || "Failed to post.");
         } finally {
             setIsPending(false);

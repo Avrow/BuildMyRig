@@ -24,7 +24,7 @@ export default function NewsModal({ news, isOpen, onClose }) {
 				{/* Header */}
 				<div className="sticky top-0 flex items-start justify-between border-b border-border bg-card p-6">
 					<div className="flex-1 pr-4">
-						<div className="mb-2 flex flex-wrap gap-2">
+						<div className="-mt-1 mb-2 flex flex-wrap gap-2">
 							<span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
 								{news.category}
 							</span>

@@ -12,6 +12,11 @@ import reviewRouter from "./routes/review.route.js";
 import shopRoute from "./routes/shop.route.js";
 import marketplaceRoute from "./routes/marketplaceRoutes.js";
 import aiBuildMatcherRoute from "./routes/ai-build-matcher.route.js";
+import pricewatcherRoute from "./routes/pricewatcher.route.js";
+import inventoryalertRoute from "./routes/inventoryalert.route.js";
+import quoteRoute from "./routes/quoteRoutes.js";
+import marketTrendRoute from "./routes/markettrend.route.js";
+
 
 const app = express();
 
@@ -37,6 +42,12 @@ app.use("/api/news", newsRouter);
 app.use("/api", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/shops", shopRoute);
+// TODO: add user route
+app.use("/api/pricewatcher", pricewatcherRoute);
+app.use("/api/inventoryalert", inventoryalertRoute);
+app.use("/api/quotes", quoteRoute);
+app.use("/api/markettrend", marketTrendRoute);
+
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -48,5 +59,6 @@ app.use((error, req, res, next) => {
 app.use((req, res) => {
 	res.status(404).json({ error: "This route does not exist" });
 });
+
 
 export default app;

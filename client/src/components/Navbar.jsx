@@ -4,19 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import {
-    LogOut,
-    LayoutDashboard,
-    Menu,
-    X,
-    Loader2,
-    Zap,
-    Store,
-    Users,
-    Cpu,
-    Newspaper,
-    Sparkles,
-    Calculator,
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight } from "lucide-react";
+>>>>>>> a7b2396f7682243eb336b9909dbaef701033cbb5
 } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
@@ -31,7 +20,7 @@ export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
-    const handleLogout = async () => {
+<    const handleLogout = async () => {
         setLoggingOut(true);
         try {
             await logout();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Zap, ShieldCheck, Cpu, ShoppingCart, MessageSquare } from "lucide-react";
+import { ArrowRight, Zap, ShieldCheck, Cpu, ShoppingCart, MessageSquare, Sparkles, Eye, Bolt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

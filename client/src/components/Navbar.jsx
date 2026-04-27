@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";

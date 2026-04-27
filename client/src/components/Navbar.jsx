@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Tag, Bell } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Tag, Bell, TrendingUp } from "lucide-react";
 import {
 	
 	Users,
@@ -46,18 +46,9 @@ const navLinks = [
   { href: "/shop-finder", label: "Shop Finder", icon: Store },
   { href: "/price-watcher", label: "Price Watcher", icon: Tag },
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
-  		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
-		{ href: "/components", label: "Components", icon: Cpu },
-		{ href: "/spec-compare", label: "Spec Compare", icon: ArrowLeftRight },
-		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
-		// { href: "/vault", label: "Vault", icon: PackageOpen },
-		{ href: "/community", label: "Community", icon: Users },
-		{ href: "/news", label: "News", icon: Newspaper },
-		
+  { href: "/market-trend", label: "Market Trend", icon: TrendingUp },
   ...(user ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : [])
 ];
-
-
 
 	return (
 		<header className='sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 dark:border-slate-800/80 dark:bg-slate-950/80 backdrop-blur-md'>

@@ -21,28 +21,21 @@ function InventoryAlertContent() {
   const [successMsg, setSuccessMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Form state
   const [componentName, setComponentName] = useState(searchParams.get("componentName") || "");
   const [retailerName, setRetailerName] = useState(searchParams.get("retailerName") || "");
   const [email, setEmail] = useState("");
-
-  // Selected component and retailer from dropdown
   const [selectedComponentId, setSelectedComponentId] = useState(null);
 
-  // Autocomplete state
   const [componentSuggestions, setComponentSuggestions] = useState([]);
   const [retailerSuggestions, setRetailerSuggestions] = useState([]);
   const [showComponentDropdown, setShowComponentDropdown] = useState(false);
   const [showRetailerDropdown, setShowRetailerDropdown] = useState(false);
-
-  // Stock validation
   const [stockChecking, setStockChecking] = useState(false);
   const [stockError, setStockError] = useState(null);
 
   const componentRef = useRef(null);
   const retailerRef = useRef(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClick = (e) => {
       if (componentRef.current && !componentRef.current.contains(e.target)) {
@@ -56,7 +49,6 @@ function InventoryAlertContent() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // Fetch all alerts
   const fetchAlerts = async () => {
     setLoading(true);
     try {
@@ -75,7 +67,6 @@ function InventoryAlertContent() {
     fetchAlerts();
   }, []);
 
-  // Search components as user types
   const handleComponentInput = async (value) => {
     setComponentName(value);
     setSelectedComponentId(null);
@@ -96,7 +87,6 @@ function InventoryAlertContent() {
     }
   };
 
-  // Search retailers as user types
   const handleRetailerInput = async (value) => {
     setRetailerName(value);
     setStockError(null);
@@ -120,7 +110,6 @@ function InventoryAlertContent() {
     }
   };
 
-  // Select component from dropdown
   const selectComponent = (component) => {
     setComponentName(component.name);
     setSelectedComponentId(component._id);
@@ -130,13 +119,11 @@ function InventoryAlertContent() {
     setStockError(null);
   };
 
-  // Select retailer from dropdown
   const selectRetailer = async (retailer) => {
     setRetailerName(retailer.retailerName);
     setShowRetailerDropdown(false);
     setStockError(null);
 
-    // Check if out of stock
     setStockChecking(true);
     if (retailer.inStock) {
       setStockError("This component is currently IN STOCK at " + retailer.retailerName + ". Alerts can only be set for out-of-stock items!");
@@ -144,7 +131,6 @@ function InventoryAlertContent() {
     setStockChecking(false);
   };
 
-  // Set alert
   const handleSetAlert = async () => {
     if (!componentName || !email || !retailerName) {
       setError("Please fill in all fields!");
@@ -161,7 +147,6 @@ function InventoryAlertContent() {
     try {
       let componentId = selectedComponentId;
 
-      // If no component selected from dropdown, search by name
       if (!componentId) {
         const searchRes = await fetch(API_URL + "/api/components?search=" + encodeURIComponent(componentName) + "&limit=1");
         const searchData = await searchRes.json();
@@ -195,7 +180,6 @@ function InventoryAlertContent() {
     }
   };
 
-  // Delete alert
   const handleDelete = async (id) => {
     try {
       const res = await fetch(API_URL + "/api/inventoryalert/delete/" + id, {
@@ -209,64 +193,58 @@ function InventoryAlertContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-
-        {/* Hero */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-yellow-600/20 text-yellow-400 border-yellow-600/40">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200">
             Inventory Alerts
           </Badge>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-3">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 mb-3">
             Stock Notifications
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-slate-500 text-lg max-w-xl mx-auto">
             Set alerts for out-of-stock components and get notified by email when they are back in stock.
           </p>
         </div>
 
-        {/* Set Alert Form */}
-        <Card className="bg-gray-900 border border-gray-800 mb-10">
+        <Card className="border border-slate-200 shadow-sm mb-10">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Bell className="h-5 w-5 text-yellow-400" />
+            <CardTitle className="text-slate-900 flex items-center gap-2">
+              <Bell className="h-5 w-5 text-blue-500" />
               Set a New Alert
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-
-            {/* Component Name with autocomplete */}
             <div ref={componentRef} className="relative">
-              <label className="text-xs text-gray-400 mb-1 block">Component Name</label>
+              <label className="text-xs text-slate-500 mb-1 block">Component Name</label>
               <Input
                 placeholder="e.g. Nvidia RTX 4070"
                 value={componentName}
                 onChange={(e) => handleComponentInput(e.target.value)}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
               />
               {showComponentDropdown && componentSuggestions.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+                <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
                   {componentSuggestions.map((c) => (
                     <button
                       key={c._id}
                       onClick={() => selectComponent(c)}
-                      className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between"
                     >
                       <span>{c.name}</span>
-                      <span className="text-xs text-gray-400">{c.type}</span>
+                      <span className="text-xs text-slate-400">{c.type}</span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Retailer Name with autocomplete */}
             <div ref={retailerRef} className="relative">
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-slate-500 mb-1 block">
                 Retailer Name
                 {!selectedComponentId && (
-                  <span className="text-yellow-500 ml-2">(Select a component first)</span>
+                  <span className="text-amber-600 ml-2">(Select a component first)</span>
                 )}
               </label>
               <Input
@@ -274,18 +252,18 @@ function InventoryAlertContent() {
                 value={retailerName}
                 onChange={(e) => handleRetailerInput(e.target.value)}
                 disabled={!selectedComponentId}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-50"
+                className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 disabled:bg-slate-100 disabled:text-slate-400"
               />
               {showRetailerDropdown && retailerSuggestions.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+                <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
                   {retailerSuggestions.map((r) => (
                     <button
                       key={r._id}
                       onClick={() => selectRetailer(r)}
-                      className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between"
                     >
                       <span>{r.retailerName}</span>
-                      <span className={"text-xs " + (r.inStock ? "text-green-400" : "text-red-400")}>
+                      <span className={"text-xs " + (r.inStock ? "text-green-600" : "text-red-600")}>
                         {r.inStock ? "In Stock" : "Out of Stock"}
                       </span>
                     </button>
@@ -294,89 +272,86 @@ function InventoryAlertContent() {
               )}
             </div>
 
-            {/* Stock error warning */}
             {stockError && (
-              <div className="bg-red-900/20 border border-red-800 rounded-lg px-4 py-2 text-red-400 text-sm">
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-red-600 text-sm">
                 {stockError}
               </div>
             )}
 
-            {/* Email */}
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">Your Email</label>
+              <label className="text-xs text-slate-500 mb-1 block">Your Email</label>
               <Input
                 placeholder="you@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
               />
             </div>
 
             <Button
               onClick={handleSetAlert}
               disabled={submitting || !!stockError}
-              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-50"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
             >
               {submitting ? "Setting Alert..." : "Set Alert"}
             </Button>
 
             {successMsg && (
-              <p className="text-green-400 text-sm text-center">{successMsg}</p>
+              <p className="text-green-600 text-sm text-center">{successMsg}</p>
             )}
             {error && (
-              <p className="text-red-400 text-sm text-center">{error}</p>
+              <p className="text-red-600 text-sm text-center">{error}</p>
             )}
           </CardContent>
         </Card>
 
-        <Separator className="bg-gray-800 mb-10" />
+        <Separator className="bg-slate-200 mb-10" />
 
-        {/* Active Alerts */}
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <PackageCheck className="h-5 w-5 text-yellow-400" />
+        <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <PackageCheck className="h-5 w-5 text-blue-500" />
           {"Active Alerts (" + alerts.length + ")"}
         </h2>
 
-        {loading && <p className="text-gray-400 text-center py-10">Loading alerts...</p>}
+        {loading && <p className="text-slate-400 text-center py-10">Loading alerts...</p>}
 
         {!loading && alerts.length === 0 && (
           <div className="text-center py-20 space-y-3">
-            <BellOff className="mx-auto h-12 w-12 text-gray-700" />
-            <p className="text-gray-500">No alerts set yet.</p>
+            <BellOff className="mx-auto h-12 w-12 text-slate-300" />
+            <p className="text-slate-400">No alerts set yet.</p>
           </div>
         )}
 
         {!loading && alerts.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {alerts.map((alert) => (
-              <Card key={alert._id} className="bg-gray-900 border border-gray-800 hover:border-yellow-500/50 transition-all">
+              <Card key={alert._id} className="border border-slate-200 shadow-sm hover:border-blue-300 transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm text-white">
+                    <CardTitle className="text-sm text-slate-900">
                       {alert.componentName || alert.componentId?.name || "Component"}
                     </CardTitle>
                     {alert.isNotified ? (
-                      <Badge className="bg-green-600/20 text-green-400 border-green-600/40 text-xs">
+                      <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
                         Notified
                       </Badge>
                     ) : (
-                      <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-600/40 text-xs">
+                      <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
                         Watching
                       </Badge>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-xs text-gray-400">{"Email: " + alert.email}</p>
-                  <p className="text-xs text-gray-400">{"Shop: " + alert.retailerName}</p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-slate-500">{"Email: " + alert.email}</p>
+                  <p className="text-xs text-slate-500">{"Shop: " + alert.retailerName}</p>
+                  <p className="text-xs text-slate-400">
                     {"Set on: " + new Date(alert.createdAt).toLocaleDateString()}
                   </p>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => handleDelete(alert._id)}
-                    className="w-full mt-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-red-800"
+                    className="w-full mt-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Cancel Alert
@@ -393,7 +368,7 @@ function InventoryAlertContent() {
 
 export default function InventoryAlertPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
       <InventoryAlertContent />
     </Suspense>
   );

@@ -13,7 +13,7 @@ import shopRoute from "./routes/shop.route.js";
 import pricewatcherRoute from "./routes/pricewatcher.route.js";
 import inventoryalertRoute from "./routes/inventoryalert.route.js";
 import quoteRoute from "./routes/quoteRoutes.js";
-
+import marketTrendRoute from "./routes/markettrend.route.js";
 
 
 const app = express();
@@ -53,6 +53,8 @@ app.use("/api/shops", shopRoute);
 app.use("/api/pricewatcher", pricewatcherRoute);
 app.use("/api/inventoryalert", inventoryalertRoute);
 app.use("/api/quotes", quoteRoute);
+app.use("/api/markettrend", marketTrendRoute);
+
 
 app.use((error, req, res, next) => {
 	console.error("[server-error]", error);
@@ -63,5 +65,6 @@ app.use((error, req, res, next) => {
 app.use((req, res) => {
 	res.status(404).json({ error: "This route does not exist" });
 });
+
 
 export default app;

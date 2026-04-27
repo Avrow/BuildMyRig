@@ -16,6 +16,31 @@ const NEWS_CATEGORIES = [
 	"CPU News",
 ];
 
+// 🔍 Simple category detector
+const detectCategory = (title = "") => {
+	const t = title.toLowerCase();
+
+	if (t.includes("gpu") || t.includes("graphics")) return "GPU/Graphics News";
+	if (t.includes("cpu") || t.includes("intel") || t.includes("amd"))
+		return "CPU News";
+	if (t.includes("software") || t.includes("app")) return "Software News";
+	if (t.includes("price") || t.includes("market"))
+		return "PC Components & Prices";
+
+	return "Tech Discoveries";
+};
+
+// 🔄 Normalize API response → UI format
+const normalizeArticle = (item) => ({
+	title: item.title || "No title",
+	summary: item.description || "No description available",
+	imageUrl: item.urlToImage || null,
+	category: detectCategory(item.title),
+	source: item.source?.name || "Unknown",
+	publishedAt: item.publishedAt || new Date().toISOString(),
+	url: item.url,
+});
+
 function NewsCard({ article, onClick }) {
 	const formatDate = (dateString) => {
 		const date = new Date(dateString);
@@ -34,48 +59,40 @@ function NewsCard({ article, onClick }) {
 	return (
 		<article
 			onClick={onClick}
-			className="group cursor-pointer overflow-hidden rounded-lg border border-border bg-card hover:shadow-lg transition-all duration-300 hover:border-primary/50"
+			className='group cursor-pointer overflow-hidden rounded-lg border bg-card hover:shadow-lg transition'
 		>
 			{/* Image */}
 			{article.imageUrl && (
-				<div className="relative h-48 overflow-hidden bg-muted">
+				<div className='h-48 overflow-hidden bg-muted'>
 					<img
 						src={article.imageUrl}
 						alt={article.title}
-						className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+						className='w-full h-full object-cover group-hover:scale-105 transition'
 						onError={(e) => {
-							e.target.parentElement.style.display = "none";
+							e.target.src = "/fallback.jpg"; // optional fallback
 						}}
 					/>
 				</div>
 			)}
 
 			{/* Content */}
-			<div className="flex flex-col p-4 sm:p-5">
-				<div className="mb-2 flex items-start justify-between gap-2">
-					<span className="inline-block rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary flex-shrink-0">
+			<div className='p-4'>
+				<div className='flex justify-between text-xs mb-2'>
+					<span className='bg-primary/10 px-2 py-1 rounded'>
 						{article.category}
 					</span>
-					<span className="text-xs text-muted-foreground flex-shrink-0">
-						{formatDate(article.publishedAt)}
-					</span>
+					<span>{formatDate(article.publishedAt)}</span>
 				</div>
 
-				<h3 className="mb-2 line-clamp-2 text-base font-semibold text-card-foreground group-hover:text-primary transition-colors sm:text-lg">
-					{article.title}
-				</h3>
+				<h3 className='font-semibold line-clamp-2 mb-2'>{article.title}</h3>
 
-				<p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
+				<p className='text-sm text-muted-foreground line-clamp-2'>
 					{article.summary}
 				</p>
 
-				<div className="mt-auto flex items-center justify-between">
-					<span className="text-xs text-muted-foreground">
-						{article.source}
-					</span>
-					<span className="text-xs font-medium text-primary group-hover:translate-x-1 transition-transform">
-						Read more →
-					</span>
+				<div className='flex justify-between mt-3 text-xs'>
+					<span>{article.source}</span>
+					<span className='text-primary'>Read →</span>
 				</div>
 			</div>
 		</article>
@@ -86,247 +103,106 @@ function NewsPageContent() {
 	const [news, setNews] = useState([]);
 	const [filteredNews, setFilteredNews] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [fetchError, setFetchError] = useState(null);
+	const [error, setError] = useState(null);
 	const [selectedCategory, setSelectedCategory] = useState("All");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedNews, setSelectedNews] = useState(null);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [refreshing, setRefreshing] = useState(false);
-	const [lastRefresh, setLastRefresh] = useState(null);
 
-	// Fetch news
+	// 🚀 Fetch + normalize
 	const fetchNews = async () => {
 		try {
-			setFetchError(null);
-			setRefreshing(true);
-			const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/news`);
+			setError(null);
 
-			if (selectedCategory !== "All") {
-				url.searchParams.append("category", selectedCategory);
-			}
-			if (searchQuery) {
-				url.searchParams.append("search", searchQuery);
-			}
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/news`);
 
-			const response = await fetch(url);
-			const data = await response.json().catch(() => null);
+			const data = await res.json();
 
-			if (!response.ok || !data?.success) {
-				throw new Error(
-					data?.error ||
-						"Unable to load news right now. Please try again in a moment.",
-				);
-			}
+			if (!res.ok) throw new Error("Failed to fetch");
 
-			setNews(data.data || []);
-			setLastRefresh(new Date().toLocaleTimeString());
-		} catch (error) {
-			console.error("Error fetching news:", error);
-			setFetchError(
-				error?.message ||
-					"Unable to load news right now. Please check your server logs.",
-			);
+			// support BOTH formats
+			const articles = data.data || data.articles || [];
+
+			const normalized = articles.map(normalizeArticle);
+
+			setNews(normalized);
+		} catch (err) {
+			setError("Failed to load news");
 		} finally {
-			setRefreshing(false);
 			setLoading(false);
 		}
 	};
 
-	// Filter news based on search
+	useEffect(() => {
+		fetchNews();
+	}, []);
+
+	// 🔎 Filter
 	useEffect(() => {
 		let filtered = news;
 
 		if (selectedCategory !== "All") {
-			filtered = filtered.filter(
-				(item) => item.category === selectedCategory,
-			);
+			filtered = filtered.filter((n) => n.category === selectedCategory);
 		}
 
 		if (searchQuery) {
-			const query = searchQuery.toLowerCase();
+			const q = searchQuery.toLowerCase();
 			filtered = filtered.filter(
-				(item) =>
-					item.title.toLowerCase().includes(query) ||
-					item.summary.toLowerCase().includes(query),
+				(n) =>
+					n.title.toLowerCase().includes(q) ||
+					n.summary.toLowerCase().includes(q),
 			);
 		}
 
 		setFilteredNews(filtered);
 	}, [news, selectedCategory, searchQuery]);
 
-	// Initial fetch
-	useEffect(() => {
-		fetchNews();
-	}, []);
-
-	// Auto-refresh every 10 minutes
-	useEffect(() => {
-		const interval = setInterval(() => {
-			fetchNews();
-		}, 10 * 60 * 1000); // 10 minutes
-
-		return () => clearInterval(interval);
-	}, [selectedCategory, searchQuery]);
-
-	const handleCategoryChange = (category) => {
-		setSelectedCategory(category);
-	};
-
-	const handleRefresh = () => {
-		fetchNews();
-	};
-
-	const handleNewsClick = (article) => {
-		setSelectedNews(article);
-		setIsModalOpen(true);
-	};
-
 	return (
 		<>
 			<Navbar />
-			<div className="min-h-screen bg-background">
-			{/* Header */}
-				<div className="border-b border-border bg-card sticky top-16 z-40">
-				<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-					<div className="mb-6">
-						<h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-							Tech News Hub
-						</h1>
-						<p className="mt-2 text-muted-foreground">
-							Stay updated with the latest in PC components, software, and
-							technology
-						</p>
-					</div>
 
-					{/* Search Bar */}
-					<div className="relative mb-6">
-						<Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-						<Input
-							type="text"
-							placeholder="Search news by title or topic..."
-							className="w-full pl-10"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-						/>
-					</div>
+			<div className='max-w-7xl mx-auto p-4'>
+				<h1 className='text-3xl font-bold mb-4'>Tech News Hub</h1>
 
-					{/* Controls */}
-					<div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							{lastRefresh && (
-								<>
-									<span>Last updated: {lastRefresh}</span>
-									<span className="text-xs">
-										(Auto-refreshes every 10 min)
-									</span>
-								</>
-							)}
-						</div>
-						<Button
-							onClick={handleRefresh}
-							disabled={refreshing}
-							variant="outline"
-							size="sm"
-							className="gap-2"
+				{/* Search */}
+				<div className='relative mb-4'>
+					<Search className='absolute left-3 top-3 h-4 w-4' />
+					<Input
+						className='pl-10'
+						placeholder='Search...'
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+					/>
+				</div>
+
+				{/* Categories */}
+				<div className='flex gap-2 flex-wrap mb-6'>
+					{NEWS_CATEGORIES.map((cat) => (
+						<button
+							key={cat}
+							onClick={() => setSelectedCategory(cat)}
+							className={`px-3 py-1 rounded ${
+								selectedCategory === cat ? "bg-primary text-white" : "bg-muted"
+							}`}
 						>
-							<RefreshCw
-								className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-							/>
-							{refreshing ? "Refreshing..." : "Refresh"}
-						</Button>
-					</div>
+							{cat}
+						</button>
+					))}
 				</div>
-			</div>
 
-			{/* Category Filters */}
-			<div className="border-b border-border bg-background sticky top-80 z-30">
-				<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-					<div className="flex items-center gap-2 mb-3 sm:mb-0">
-						<Filter className="h-4 w-4 text-muted-foreground" />
-						<span className="text-sm font-medium text-foreground">
-							Categories:{" "}
-						</span>
-					</div>
-					<div className="flex flex-wrap gap-2">
-						{NEWS_CATEGORIES.map((category) => (
-							<button
-								key={category}
-								onClick={() => handleCategoryChange(category)}
-								className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-									selectedCategory === category
-										? "bg-primary text-primary-foreground"
-										: "bg-muted text-muted-foreground hover:bg-muted/80"
-								}`}
-							>
-								{category}
-							</button>
-						))}
-					</div>
-				</div>
-			</div>
-
-			{/* Main Content */}
-			<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+				{/* Content */}
 				{loading ? (
-					<div className="space-y-4">
-						{[1, 2, 3].map((i) => (
-							<div
+					<p>Loading...</p>
+				) : error ? (
+					<p>{error}</p>
+				) : (
+					<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+						{filteredNews.map((article, i) => (
+							<NewsCard
 								key={i}
-								className="h-64 animate-pulse rounded-lg bg-muted"
+								article={article}
+								onClick={() => setSelectedNews(article)}
 							/>
 						))}
-					</div>
-				) : fetchError ? (
-					<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-12 text-center">
-						<h3 className="text-lg font-semibold text-foreground">
-							Unable to load news
-						</h3>
-						<p className="mt-2 text-muted-foreground">{fetchError}</p>
-						<Button
-							onClick={handleRefresh}
-							variant="outline"
-							className="mt-4 gap-2"
-						>
-							<RefreshCw className="h-4 w-4" />
-							Try Again
-						</Button>
-					</div>
-				) : filteredNews.length > 0 ? (
-					<>
-						<div className="mb-6 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-foreground">
-								{filteredNews.length} articles{" "}
-								{selectedCategory !== "All" &&
-									`in ${selectedCategory}`}
-								{searchQuery && ` matching "${searchQuery}"`}
-							</h2>
-						</div>
-						<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-							{filteredNews.map((article) => (
-								<NewsCard
-									key={article.id}
-									article={article}
-									onClick={() => handleNewsClick(article)}
-								/>
-							))}
-						</div>
-					</>
-				) : (
-					<div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
-						<h3 className="text-lg font-semibold text-foreground">
-							No articles found
-						</h3>
-						<p className="mt-2 text-muted-foreground">
-							Try adjusting your search or category filters
-						</p>
-						<Button
-							onClick={handleRefresh}
-							variant="outline"
-							className="mt-4 gap-2"
-						>
-							<RefreshCw className="h-4 w-4" />
-							Refresh News
-						</Button>
 					</div>
 				)}
 			</div>
@@ -334,31 +210,16 @@ function NewsPageContent() {
 			{/* Modal */}
 			<NewsModal
 				news={selectedNews}
-				isOpen={isModalOpen}
-				onClose={() => {
-					setIsModalOpen(false);
-					setSelectedNews(null);
-				}}
+				isOpen={!!selectedNews}
+				onClose={() => setSelectedNews(null)}
 			/>
-			</div>
 		</>
 	);
 }
 
 export default function NewsPage() {
 	return (
-		<Suspense
-			fallback={
-				<div className="flex min-h-screen items-center justify-center bg-background">
-					<div className="space-y-4 text-center">
-						<div className="inline-flex h-12 w-12 animate-spin rounded-full border-4 border-muted border-t-primary"></div>
-						<p className="text-muted-foreground">
-							Loading latest tech news...
-						</p>
-					</div>
-				</div>
-			}
-		>
+		<Suspense fallback={<p>Loading...</p>}>
 			<NewsPageContent />
 		</Suspense>
 	);

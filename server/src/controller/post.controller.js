@@ -1,6 +1,10 @@
 import BuildPost from "../models/buildPost.js";
+import axios from "axios";
+import FormData from "form-data";
+import { checkImageSafety } from "../utils/picPurify.js";
 
-// given a post ID, fetch the post details along with its reviews, average rating, and review count for better UX
+
+// given a post ID, fetch the post details along with its reviews, average rating, and review count
 export async function getPostById(req, res) {
     try {
         const post = await BuildPost.findById(req.params.id);
@@ -13,7 +17,7 @@ export async function getPostById(req, res) {
     }
 }
 
-// all build posts fetching with average rating and review count for better UX
+// all build posts fetching with average rating and review count
 export async function getAllBuildPosts(req, res) {
     try {
         const posts = await BuildPost.aggregate([
@@ -39,17 +43,17 @@ export async function getAllBuildPosts(req, res) {
     }
 }
 
-// new build post creation with 1500-word limit
+// new build post creation with 1500-word limit and AI Safe Search
 export async function createBuildPost(req, res) {
     const { imageUrl, caption, cpu, gpu, ram, description } = req.body;
 
+    // ১. সব ফিল্ড আছে কি না চেক
     if (!imageUrl || !caption || !cpu || !gpu || !ram || !description) {
         return res.status(400).json({ success: false, error: "All fields are required!" });
     }
 
+    // ২. ওয়ার্ড কাউন্ট ভ্যালিডেশন
     const wordCount = description.trim().split(/\s+/).filter(Boolean).length;
-    
-    // max 1500 words validation for description
     if (wordCount > 1500) {
         return res.status(400).json({ 
             success: false, 
@@ -58,9 +62,24 @@ export async function createBuildPost(req, res) {
     }
 
     try {
+        // ৩. **FEATURE 3: PicPurify Safe Search Check**
+        // পোস্ট সেভ করার আগেই ইমেজটি স্ক্যান করা হচ্ছে
+        const moderation = await checkImageSafety(imageUrl);
+
+        if (!moderation.isSafe) {
+            return res.status(400).json({ 
+                success: false, 
+                violation: true, // ফ্রন্টএন্ডে লাল ক্রস দেখানোর জন্য এই ফ্ল্যাগটি দরকার
+                error: moderation.message 
+            });
+        }
+
+        // ৪. যদি নিরাপদ হয়, তবেই ডাটাবেসে সেভ হবে
         const post = await BuildPost.create({ imageUrl, caption, cpu, gpu, ram, description });
         res.status(201).json({ success: true, id: post._id });
+        
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, error: "Failed to save build." });
     }
 }

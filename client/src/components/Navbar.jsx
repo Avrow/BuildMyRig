@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Tag, Bell } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Tag, Bell, Wrench } from "lucide-react";
 import {
 	
 	Users,
@@ -45,6 +45,7 @@ const navLinks = [
   { href: "/shop-finder", label: "Shop Finder", icon: Store },
   { href: "/price-watcher", label: "Price Watcher", icon: Tag },
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
+		{ href: "/build-planner", label: "Build Planner", icon: Wrench },
   		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
 		{ href: "/components", label: "Components", icon: Cpu },
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },

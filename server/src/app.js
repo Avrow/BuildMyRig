@@ -12,6 +12,9 @@ import reviewRouter from "./routes/review.route.js";
 import shopRoute from "./routes/shop.route.js";
 import pricewatcherRoute from "./routes/pricewatcher.route.js";
 import inventoryalertRoute from "./routes/inventoryalert.route.js";
+import buildRoute from "./routes/build.route.js";
+import aiBuildMatcherRoute from "./routes/ai-build-matcher.route.js";
+
 
 
 
@@ -51,6 +54,9 @@ app.use("/api/shops", shopRoute);
 // TODO: add user route
 app.use("/api/pricewatcher", pricewatcherRoute);
 app.use("/api/inventoryalert", inventoryalertRoute);
+app.use("/api/builds", buildRoute);
+app.use("/api/ai-build-matcher", aiBuildMatcherRoute);
+
 
 app.use((error, req, res, next) => {
 	console.error("[server-error]", error);

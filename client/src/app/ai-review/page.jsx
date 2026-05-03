@@ -21,7 +21,7 @@ export default function AIReviewPage() {
   
   const searchRef = useRef(null);
 
-  // Search products as user types (case insensitive)
+  // Search products as user types (case insensitive - like inventory alert)
   useEffect(() => {
     const searchProducts = async () => {
       if (searchQuery.length < 2) {
@@ -45,7 +45,7 @@ export default function AIReviewPage() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  // Close dropdown on click outside
+  // Close dropdown on click outside (same as inventory alert)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -98,15 +98,6 @@ export default function AIReviewPage() {
     }
   };
 
-  const getVerdictColor = (verdict) => {
-    if (!verdict) return "bg-purple-100 text-purple-700";
-    if (verdict.includes("1440p") || verdict.includes("Balanced")) return "bg-green-100 text-green-700";
-    if (verdict.includes("bottleneck")) return "bg-red-100 text-red-700";
-    if (verdict.includes("power")) return "bg-orange-100 text-orange-700";
-    if (verdict.includes("Entry")) return "bg-blue-100 text-blue-700";
-    return "bg-purple-100 text-purple-700";
-  };
-
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
@@ -123,7 +114,7 @@ export default function AIReviewPage() {
           </p>
         </div>
 
-        {/* Search Section */}
+        {/* Search Section - Same style as inventory alert */}
         <Card className="border border-slate-200 shadow-sm mb-8">
           <CardHeader>
             <CardTitle className="text-slate-900 flex items-center gap-2">
@@ -135,7 +126,7 @@ export default function AIReviewPage() {
             <div ref={searchRef} className="relative">
               <div className="flex gap-2">
                 <Input
-                  placeholder="Search for CPU, GPU, RAM, Storage, Motherboard, PSU, Case, Cooler..."
+                  placeholder="Search for CPU, GPU, RAM, Storage, Motherboard..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 flex-1"
@@ -150,22 +141,17 @@ export default function AIReviewPage() {
                 </Button>
               </div>
               
-              {/* Suggestions Dropdown */}
+              {/* Suggestions Dropdown - Same as inventory alert */}
               {showDropdown && suggestions.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
                   {suggestions.map((product) => (
                     <button
                       key={product._id}
                       onClick={() => addProduct(product)}
                       className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between"
                     >
-                      <div className="flex-1">
-                        <span className="font-medium">{product.name}</span>
-                        <span className="text-xs text-slate-400 ml-2">{product.brand}</span>
-                      </div>
-                      <Badge className="bg-slate-100 text-slate-600 text-xs">
-                        {product.type}
-                      </Badge>
+                      <span>{product.name}</span>
+                      <span className="text-xs text-slate-400">{product.type}</span>
                     </button>
                   ))}
                 </div>
@@ -246,7 +232,7 @@ export default function AIReviewPage() {
                   <p className="text-sm text-slate-500">Overall Score</p>
                   <p className="text-4xl font-bold text-purple-600">{analysis.overallScore || 75}/100</p>
                 </div>
-                <div className={`px-4 py-2 rounded-full ${getVerdictColor(analysis.verdict)}`}>
+                <div className="px-4 py-2 rounded-full bg-purple-100 text-purple-700">
                   <span className="font-semibold">{analysis.verdict || "Custom Build"}</span>
                 </div>
               </div>
@@ -303,7 +289,7 @@ export default function AIReviewPage() {
         {!analysis && !analyzing && selectedProducts.length === 0 && !error && (
           <div className="text-center py-20">
             <Brain className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-400">Search for products, click Add to include them in your build</p>
+            <p className="text-slate-400">Search for products, click + to add them to your build</p>
             <p className="text-slate-400 text-sm mt-2">Then click "Review Build with AI" for analysis</p>
           </div>
         )}

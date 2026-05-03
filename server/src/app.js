@@ -15,7 +15,7 @@ import aiBuildMatcherRoute from "./routes/ai-build-matcher.route.js";
 import pricewatcherRoute from "./routes/pricewatcher.route.js";
 import inventoryalertRoute from "./routes/inventoryalert.route.js";
 import buildRoute from "./routes/build.route.js";
-
+import aiReviewRoute from "./routes/ai-review.route.js";
 
 
 import quoteRoute from "./routes/quoteRoutes.js";
@@ -54,7 +54,7 @@ app.use("/api/ai-build-matcher", aiBuildMatcherRoute);
 
 app.use("/api/quotes", quoteRoute);
 app.use("/api/markettrend", marketTrendRoute);
-
+app.use("/api/ai-review", aiReviewRoute);
 
 // Error handling middleware
 app.use((error, req, res, next) => {

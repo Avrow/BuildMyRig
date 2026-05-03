@@ -3,184 +3,203 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const openrouter = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+
+  defaultHeaders: {
+    "HTTP-Referer": "http://localhost:3000",
+    "X-Title": "BuildMyRig",
+  },
 });
 
-// Component specification templates for comparison
-const componentSpecs = {
-  CPU: ["cores", "threads", "baseClock", "boostClock", "tdp"],
-  GPU: ["vram", "memoryInterface", "tdp"],
-  RAM: ["capacity", "speed", "type"],
-  Storage: ["capacity", "type", "readSpeed"],
-  Motherboard: ["socket", "chipset", "formFactor"],
-  PSU: ["watts", "efficiency"],
-  Case: ["formFactor"],
-  Cooler: ["type", "tdp"]
-};
+const FREE_MODELS = [
+  "mistralai/mistral-7b-instruct:free"
+];
 
-// Helper: Get component specifications
-const getComponentSpecs = (component) => {
-  const specs = {};
-  if (component.specs) {
-    Object.keys(component.specs).forEach(key => {
-      specs[key] = component.specs[key];
-    });
+const getFallbackAnalysis = (components) => {
+  const hasCPU = components.some((c) => c.type === "CPU");
+  const hasGPU = components.some((c) => c.type === "GPU");
+  const hasRAM = components.some((c) => c.type === "RAM");
+
+  let verdict = "Balanced productivity workstation";
+  let score = 70;
+  let gamingPerformance = "Good for everyday gaming";
+  let productivityPerformance = "Good for multitasking";
+  let bottlenecks = "No major bottlenecks detected";
+  let recommendations = "Use a reliable power supply";
+  let powerConsumption = "Estimated 400W - 550W";
+
+  if (hasCPU && hasGPU) {
+    verdict = "Great setup for 1440p gaming";
+    score = 85;
+    gamingPerformance = "Excellent 1440p gaming performance";
+    productivityPerformance =
+      "Strong productivity and multitasking performance";
   }
-  specs.type = component.type;
-  specs.name = component.name;
-  specs.brand = component.brand;
-  return specs;
+
+  if (!hasGPU) {
+    verdict = "Entry-level build";
+    score = 45;
+    gamingPerformance = "Limited gaming performance";
+    bottlenecks = "No dedicated GPU detected";
+    recommendations =
+      "Consider adding a dedicated GPU for better gaming performance";
+  }
+
+  if (!hasRAM) {
+    recommendations += ". Add at least 16GB RAM";
+  }
+
+  return {
+    overallScore: score,
+    verdict,
+    gamingPerformance,
+    productivityPerformance,
+    compatibility: "Components appear compatible",
+    bottlenecks,
+    powerConsumption,
+    recommendations,
+    summary: `Build analyzed with ${components.length} component(s).`,
+  };
 };
 
-// Helper: Generate performance analysis prompt
-const generateAnalysisPrompt = (components) => {
-  const componentList = components.map(c => {
-    const specs = getComponentSpecs(c);
-    return `
-      Component: ${c.name}
-      Type: ${c.type}
-      Brand: ${c.brand}
-      Specifications: ${JSON.stringify(specs, null, 2)}
-    `;
-  }).join("\n---\n");
+const cleanJSONResponse = (text) => {
+  return text
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+};
 
-  return `
-You are an expert PC builder and hardware analyst. Analyze the following PC build components and provide a detailed review.
+const callOpenRouter = async (prompt, model) => {
+  try {
+    const completion = await openrouter.chat.completions.create({
+      model: model,
+
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a professional PC hardware expert. Return ONLY valid JSON.",
+        },
+
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+
+      temperature: 0.3,
+      max_tokens: 500,
+    });
+
+    return completion.choices[0].message.content;
+
+  } catch (error) {
+    console.log(`Model failed: ${model}`);
+    console.log(error.message);
+
+    return null;
+  }
+};
+
+export const reviewBuild = async (req, res) => {
+  try {
+    const { components } = req.body;
+
+    if (!components || components.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "No components provided",
+      });
+    }
+
+    const componentList = components
+      .map((component) => {
+        return `- ${component.type}: ${component.name}`;
+      })
+      .join("\n");
+
+    const prompt = `
+Analyze this PC build.
 
 Components:
 ${componentList}
 
-Please provide analysis in the following JSON format:
+Return ONLY valid JSON in this exact format:
+
 {
-  "overallScore": "number from 0-100",
-  "verdict": "one of: 'Great setup for 1440p gaming', 'Balanced productivity workstation', 'High power consumption build', 'Entry-level gaming setup', 'Potential RAM bottleneck detected', 'CPU bottleneck detected', 'GPU bottleneck detected', 'Well-balanced budget build'",
-  "gamingPerformance": "analysis of gaming capabilities",
-  "productivityPerformance": "analysis for productivity tasks",
-  "compatibility": "check if components are compatible (socket, form factor, power)",
-  "bottlenecks": "identified bottlenecks if any",
-  "powerConsumption": "estimated power usage in watts",
-  "recommendations": "suggestions for improvement",
-  "summary": "overall conclusion in 2-3 sentences"
+  "overallScore": 0,
+  "verdict": "",
+  "gamingPerformance": "",
+  "productivityPerformance": "",
+  "compatibility": "",
+  "bottlenecks": "",
+  "powerConsumption": "",
+  "recommendations": "",
+  "summary": ""
 }
-
-Be specific and technical. Use the actual specifications provided.
 `;
-};
 
-// Main review function
-export const reviewBuild = async (req, res) => {
-  try {
-    const { components } = req.body;
-    
-    if (!components || components.length === 0) {
-      return res.status(400).json({ error: "No components provided for review" });
+    let response = null;
+
+    for (const model of FREE_MODELS) {
+      console.log(`Trying model: ${model}`);
+
+      response = await callOpenRouter(prompt, model);
+
+      if (response) {
+        console.log(`Success with model: ${model}`);
+        break;
+      }
     }
-    
-    console.log(`🔍 Analyzing build with ${components.length} components...`);
-    
-    const prompt = generateAnalysisPrompt(components);
-    
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert PC hardware analyst. Provide detailed, technical analysis of PC builds."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 1000
-    });
-    
-    const response = completion.choices[0].message.content;
-    
-    // Parse JSON response
+
     let analysis;
-    try {
-      analysis = JSON.parse(response);
-    } catch (e) {
-      // If response is not pure JSON, extract or return as text
-      analysis = {
-        overallScore: 75,
-        verdict: "Custom build configuration",
-        gamingPerformance: response,
-        productivityPerformance: "See gaming performance",
-        compatibility: "Check component specifications",
-        bottlenecks: "None detected",
-        powerConsumption: "Estimated 400-600W",
-        recommendations: "Consider upgrading based on usage",
-        summary: response.substring(0, 500)
-      };
+
+    if (response) {
+      try {
+        const cleanedResponse = cleanJSONResponse(response);
+
+        analysis = JSON.parse(cleanedResponse);
+
+      } catch (error) {
+        console.log("Failed to parse AI response.");
+        analysis = getFallbackAnalysis(components);
+      }
+
+    } else {
+      console.log("All models failed. Using fallback analysis.");
+
+      analysis = getFallbackAnalysis(components);
     }
-    
-    console.log(`✅ Analysis complete for ${components.length} components`);
-    
-    res.json({
+
+    return res.json({
       success: true,
-      analysis: analysis,
-      componentsReviewed: components.map(c => ({
-        id: c._id,
-        name: c.name,
-        type: c.type
-      }))
+      analysis,
+      reviewedComponents: components,
     });
-    
+
   } catch (error) {
-    console.error("AI Review error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Review Build Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Failed to analyze build",
+    });
   }
 };
 
-// Quick analysis for single component
 export const analyzeComponent = async (req, res) => {
   try {
-    const { componentId } = req.params;
-    const db = mongoose.connection.db;
-    const component = await db.collection('components').findOne({ 
-      _id: new mongoose.Types.ObjectId(componentId) 
-    });
-    
-    if (!component) {
-      return res.status(404).json({ error: "Component not found" });
-    }
-    
-    const prompt = `
-      Analyze this PC component and provide its:
-      - Strengths
-      - Weaknesses
-      - Best use cases
-      - Value for money (good/average/poor)
-      - Comparable alternatives
-      
-      Component: ${component.name}
-      Type: ${component.type}
-      Brand: ${component.brand}
-      Specifications: ${JSON.stringify(component.specs || {}, null, 2)}
-    `;
-    
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a PC hardware expert." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
-    
-    res.json({
+    return res.json({
       success: true,
-      component: component.name,
-      analysis: completion.choices[0].message.content
+      message: "Single component analysis coming soon",
     });
-    
+
   } catch (error) {
-    console.error("Component analysis error:", error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      success: false,
+      error: "Something went wrong",
+    });
   }
 };

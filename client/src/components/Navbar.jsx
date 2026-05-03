@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench,Brain } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ const navLinks = [
   { href: "/price-watcher", label: "Price Watcher", icon: Tag },
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
 		{ href: "/build-planner", label: "Build Planner", icon: Wrench },
+        { href: "/ai-review", label: "AI Review", icon: Brain },
   		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
 		{ href: "/components", label: "Components", icon: Cpu },
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },

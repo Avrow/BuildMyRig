@@ -14,7 +14,10 @@ const openrouter = new OpenAI({
 });
 
 const FREE_MODELS = [
-  "mistralai/mistral-7b-instruct:free"
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "google/gemma-4-26b-a4b-it:free",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 ];
 
 const getFallbackAnalysis = (components) => {

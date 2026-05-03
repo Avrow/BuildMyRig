@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench,Brain } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Loader2, Zap, Store, Users, Cpu, Newspaper, Sparkles, Calculator, PackageOpen, ArrowLeftRight, Tag, Bell, Wrench,Brain,TrendingUp } from "lucide-react";
 
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const navLinks = [
   { href: "/shop-finder", label: "Shop Finder", icon: Store },
   { href: "/price-watcher", label: "Price Watcher", icon: Tag },
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
+   { href: "/market-trend", label: "Market Trend", icon: TrendingUp },
 		{ href: "/build-planner", label: "Build Planner", icon: Wrench },
         { href: "/ai-review", label: "AI Review", icon: Brain },
   		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },

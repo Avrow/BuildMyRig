@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Plus, LayoutGrid } from "lucide-react";
 import MarketplaceCard from "@/components/MarketplaceCard";
 import CreateListingForm from "@/components/CreateListingForm";
+import Navbar from "@/components/Navbar";
 import {
 	Dialog,
 	DialogContent,
@@ -22,7 +23,7 @@ export default function MarketplacePage() {
 		try {
 			// URL logic: .env এ /api থাকলে এখানে ডাবল হবে না
 			const apiUrl =
-				process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+				process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 			const res = await fetch(`${apiUrl}/api/marketplace`);
 
 			if (res.ok) {
@@ -43,13 +44,14 @@ export default function MarketplacePage() {
 
 	return (
 		<div className='min-h-screen bg-slate-50 dark:bg-slate-950'>
-			{/* Navbar Section */}
-			<div className='bg-white dark:bg-slate-900 border-b sticky top-0 z-10 px-6 py-4 shadow-sm'>
-				<div className='max-w-6xl mx-auto flex justify-between items-center'>
-					<h1 className='text-xl font-black flex items-center gap-2'>
-						<LayoutGrid className='text-blue-600' /> Marketplace
-					</h1>
+			<Navbar />
 
+			{/* Content Section */}
+			<div className='max-w-6xl mx-auto p-6'>
+				<div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8'>
+					<h2 className='text-3xl font-bold flex items-center gap-2'>
+						<LayoutGrid className='text-blue-600' /> Today{"'"}s Picks
+					</h2>
 					<Dialog>
 						<DialogTrigger asChild>
 							<Button className='bg-blue-600 text-white rounded-full px-6 shadow-lg hover:bg-blue-700 transition-all'>
@@ -64,16 +66,10 @@ export default function MarketplacePage() {
 									image for safety.
 								</DialogDescription>
 							</DialogHeader>
-							{/* Create Listing Form Component */}
 							<CreateListingForm />
 						</DialogContent>
 					</Dialog>
 				</div>
-			</div>
-
-			{/* Content Section */}
-			<div className='max-w-6xl mx-auto p-6'>
-				<h2 className='text-3xl font-bold mb-8'>Today{"'"}s Picks</h2>
 
 				{loading ? (
 					<div className='text-center py-20 font-bold text-slate-500 animate-pulse'>

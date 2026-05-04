@@ -3,15 +3,21 @@ import FormData from "form-data";
 
 export const checkImageSafety = async (imageSource, isUrl = true) => {
 	const form = new FormData();
+	const defaultTasks = [
+		"porn_moderation",
+		"gore_moderation",
+		"drug_moderation",
+		"suggestive_nudity_moderation",
+	];
+	const taskList = (
+		process.env.PICPURIFY_TASKS || defaultTasks.join(",")
+	).trim();
 
 	// Required API key
 	form.append("API_KEY", process.env.PICPURIFY_API_KEY);
 
 	// Task list (as per PicPurify docs)
-	form.append(
-		"task",
-		"porn_moderation,gore_moderation,drug_moderation,suggestive_nudity_moderation,weapons_moderation",
-	);
+	form.append("task", taskList);
 
 	// Optional: you can add origin/reference if needed for tracking
 	// form.append("reference_id", "your-id");
@@ -38,7 +44,8 @@ export const checkImageSafety = async (imageSource, isUrl = true) => {
 		if (!data || data.status !== "success") {
 			return {
 				isSafe: false,
-				message: data?.error_msg || "PicPurify API error",
+				message:
+					data?.error_msg || data?.error?.errorMsg || "PicPurify API error",
 			};
 		}
 

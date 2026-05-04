@@ -163,7 +163,7 @@ function NewsPageContent() {
 			</div>
 
 			{/* Sticky Category Filters */}
-			<div className="border-b border-border bg-background sticky top-72 z-30">
+			<div className="border-b border-border bg-background z-30">
 				<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-2 mb-3">
 						<Filter className="h-4 w-4 text-muted-foreground" />

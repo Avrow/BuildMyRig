@@ -27,10 +27,11 @@ const verifyAccessToken = async (token) => {
 };
 
 const addToCookies = async (res, token) => {
+	const isProduction = process.env.NODE_ENV === "production";
 	await res.cookie("token", token, {
-		secure: process.env.NODE_ENV === "production",
+		secure: isProduction,
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: isProduction ? "none" : "lax",
 		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 	});
 };

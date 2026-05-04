@@ -61,10 +61,11 @@ export async function loginUser(req, res) {
 }
 
 export async function logoutUser(req, res) {
+	const isProduction = process.env.NODE_ENV === "production";
 	res.clearCookie("token", {
-		secure: process.env.NODE_ENV === "production",
+		secure: isProduction,
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: isProduction ? "none" : "lax",
 	});
 	return res.status(200).json({ message: "Logged out successfully" });
 }
@@ -83,10 +84,11 @@ export async function getMe(req, res) {
 		const { password: _, ...userData } = user.toObject();
 		return res.status(200).json({ user: userData });
 	} catch {
+		const isProduction = process.env.NODE_ENV === "production";
 		res.clearCookie("token", {
 			httpOnly: true,
-			sameSite: "lax",
-			secure: process.env.NODE_ENV === "production",
+			sameSite: isProduction ? "none" : "lax",
+			secure: isProduction,
 		});
 		return res.status(401).json({ error: "Invalid or expired token" });
 	}
@@ -107,7 +109,12 @@ export async function refreshToken(req, res) {
 		await addToCookies(res, newToken);
 		return res.status(200).json({ message: "Token refreshed" });
 	} catch {
-		res.clearCookie("token");
+		const isProduction = process.env.NODE_ENV === "production";
+		res.clearCookie("token", {
+			httpOnly: true,
+			sameSite: isProduction ? "none" : "lax",
+			secure: isProduction,
+		});
 		return res.status(401).json({ error: "Invalid or expired token" });
 	}
 }

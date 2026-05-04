@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
 	getComponents,
 	updateComponentImage,
+	getComponentByIdOrName,
 	getComponentPriceHandler,
 	getComponentsPricesHandler,
 } from "../controller/component.controller.js";
@@ -19,5 +20,8 @@ router.get("/price", getComponentPriceHandler);
 
 // Batch get multiple component prices
 router.post("/prices", getComponentsPricesHandler);
+
+// Get single component by id or name
+router.get("/:idOrName", getComponentByIdOrName);
 
 export default router;

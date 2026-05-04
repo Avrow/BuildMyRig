@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import {
 	Cpu,
@@ -159,13 +160,18 @@ function ComponentCard({ component, imageState }) {
 					</>
 				)}
 
-				{price !== null && price !== undefined && (
-					<div className='mt-auto pt-2 border-t border-slate-100 dark:border-slate-800'>
+				<div className='mt-auto pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2'>
+					{price !== null && price !== undefined && (
 						<span className='text-sm font-bold text-slate-900 dark:text-white'>
 							${price.toLocaleString()}
 						</span>
-					</div>
-				)}
+					)}
+					<Link href={`/components/${encodeURIComponent(name)}`}>
+						<Button variant='outline' size='sm'>
+							Details
+						</Button>
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
@@ -340,6 +346,7 @@ export default function ComponentsPage() {
 
 	// ── Derived ────────────────────────────────────────────────────────────
 	const totalPages = pagination?.pages ?? 1;
+	const isSearching = loading && (search || inputValue);
 
 	return (
 		<div className='min-h-screen bg-white dark:bg-slate-950'>
@@ -401,6 +408,11 @@ export default function ComponentsPage() {
 						>
 							<X className='h-4 w-4' />
 						</button>
+					)}
+					{isSearching && (
+						<p className='mt-2 text-xs text-slate-500 text-center'>
+							Getting results...
+						</p>
 					)}
 				</div>
 

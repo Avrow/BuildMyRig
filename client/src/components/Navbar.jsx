@@ -25,6 +25,7 @@ const navLinks = [
   { href: "/inventory-alert", label: "Inventory Alerts", icon: Bell },
 		{ href: "/build-planner", label: "Build Planner", icon: Wrench },
   		{ href: "/quote-generator", label: "Quote Generator", icon: Calculator },
+          { href: "/spec-compare", label: "Spec Compare", icon: ArrowLeftRight },
 		{ href: "/components", label: "Components", icon: Cpu },
 		{ href: "/ai-build-matcher", label: "AI Builder", icon: Sparkles },
 		// { href: "/vault", label: "Vault", icon: PackageOpen },

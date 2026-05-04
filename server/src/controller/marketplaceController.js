@@ -52,11 +52,24 @@ export async function createMarketplacePost(req, res) {
 	}
 }
 export async function getAllMarketplaceItems(req, res) {
-    try {
-        const items = await MarketplaceItem.find().sort({ createdAt: -1 });
-		console.log("Fetched Items:", items);
-        res.status(200).json(items);
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to fetch" });
-    }
+	try {
+		const items = await MarketplaceItem.find().sort({ createdAt: -1 });
+		res.status(200).json(items);
+	} catch (error) {
+		res.status(500).json({ success: false, error: "Failed to fetch" });
+	}
+}
+
+export async function getMarketplaceItemById(req, res) {
+	try {
+		const item = await MarketplaceItem.findById(req.params.id);
+
+		if (!item) {
+			return res.status(404).json({ success: false, error: "Item not found" });
+		}
+
+		res.status(200).json({ success: true, data: item });
+	} catch (error) {
+		res.status(500).json({ success: false, error: "Failed to fetch" });
+	}
 }

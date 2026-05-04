@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import Component from "../models/Component.js";
+import { isValidObjectId } from "mongoose";
 import { fetchSerperImage } from "../lib/serper.js";
 import {
 	getComponentPrice,
@@ -51,6 +52,34 @@ function readFromJSON(type) {
 	} catch {
 		return [];
 	}
+}
+
+function readFromJSONByName(name) {
+	const target = name.toLowerCase();
+	for (const [type, file] of Object.entries(TYPE_TO_FILE)) {
+		try {
+			const raw = JSON.parse(readFileSync(resolve(DATA_DIR, file), "utf-8"));
+			const match = raw.find(
+				(item) => (item?.name ?? "").toLowerCase() === target,
+			);
+			if (match) {
+				return {
+					_id: null,
+					name: match.name,
+					brand: extractBrand(match.name),
+					type,
+					price: typeof match.price === "number" ? match.price : null,
+					imageUrl: null,
+					specs: match,
+					source: "json",
+				};
+			}
+		} catch {
+			// ignore file read errors and continue
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -188,6 +217,43 @@ export async function updateComponentImage(req, res) {
 	} catch (err) {
 		console.error("[updateComponentImage]", err);
 		res.status(500).json({ error: "Failed to update image URL" });
+	}
+}
+
+/**
+ * GET /api/components/:idOrName
+ * Returns a single component by Mongo id or exact name match.
+ */
+export async function getComponentByIdOrName(req, res) {
+	try {
+		const { idOrName } = req.params;
+		if (!idOrName) {
+			return res.status(400).json({ error: "Component id or name required" });
+		}
+
+		let component = null;
+		if (isValidObjectId(idOrName)) {
+			component = await Component.findById(idOrName).lean();
+		}
+
+		if (!component) {
+			component = await Component.findOne({
+				name: new RegExp(`^${idOrName}$`, "i"),
+			}).lean();
+		}
+
+		if (!component) {
+			const jsonComponent = readFromJSONByName(idOrName);
+			if (jsonComponent) {
+				return res.status(200).json({ component: jsonComponent });
+			}
+			return res.status(404).json({ error: "Component not found" });
+		}
+
+		return res.status(200).json({ component });
+	} catch (err) {
+		console.error("[getComponentByIdOrName]", err);
+		return res.status(500).json({ error: "Failed to fetch component" });
 	}
 }
 

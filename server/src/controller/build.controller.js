@@ -57,11 +57,19 @@ export async function generateBuildLook(req, res) {
 		}
 
 		const prompt = buildVisualPrompt(selectedComponents);
-		const imageUrl = await generateBuildLookImage(prompt);
+		const { base64, mimeType } = await generateBuildLookImage(prompt);
+		const resolvedMimeType = mimeType || "image/jpeg";
+		const imageUrl = base64 ? `data:${resolvedMimeType};base64,${base64}` : null;
+
+		if (!base64) {
+			throw new Error("Image generation returned no image data");
+		}
 
 		return res.status(200).json({
 			success: true,
 			imageUrl,
+			imageBase64: base64,
+			imageMimeType: resolvedMimeType,
 			prompt,
 		});
 	} catch (err) {

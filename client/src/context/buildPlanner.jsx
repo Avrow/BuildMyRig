@@ -196,11 +196,13 @@ export function BuildPlannerProvider({ children }) {
 			});
 
 			const data = await response.json().catch(() => ({}));
-			if (!response.ok || !data.imageUrl) {
+			const imageBase64 = data.imageBase64 || "";
+			const imageUrl = data.imageUrl || "";
+			if (!response.ok || (!imageBase64 && !imageUrl)) {
 				throw new Error(data.error || "Virtual look generation failed");
 			}
 
-			setVirtualLookUrl(data.imageUrl);
+			setVirtualLookUrl(imageBase64 || imageUrl);
 			toast.success("Virtual build look generated");
 		} catch (err) {
 			toast.error(err.message || "Failed to generate virtual look");

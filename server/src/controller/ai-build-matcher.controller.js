@@ -1,16 +1,31 @@
 import OpenAI from "openai";
 import Component from "../models/Component.js";
 import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
 dotenv.config();
 
-const openai = new OpenAI({
-	apiKey: process.env.OPENROUTER_API_KEY,
-	baseURL: "https://openrouter.ai/api/v1",
-	defaultHeaders: {
-		"HTTP-Referer": process.env.APP_URL || "http://localhost:8000",
-		"X-Title": "BuildMyRig AI Build Matcher",
-	},
-});
+function makeOpenAIClient() {
+	const openaiKey = process.env.OPENAI_API_KEY;
+	const openrouterKey = process.env.OPENROUTER_API_KEY;
+	const apiKey = openrouterKey || openaiKey;
+
+	if (!apiKey) {
+		throw new Error(
+			"Missing OPENAI_API_KEY or OPENROUTER_API_KEY in environment variables",
+		);
+	}
+
+	const config = { apiKey };
+	if (openrouterKey) {
+		config.baseURL = "https://openrouter.ai/api/v1";
+		config.defaultHeaders = {
+			"HTTP-Referer": process.env.APP_URL || "http://localhost:8000",
+			"X-Title": "BuildMyRig AI Build Matcher",
+		};
+	}
+
+	return new OpenAI(config);
+}
 
 /**
  * 🔥 SMART FILTERING CONFIG
@@ -141,6 +156,12 @@ Preferred: ${preferredBrands.join(", ") || "None"}
 Notes: ${extraNotes || "None"}`;
 
 		console.log("[AI] Calling OpenRouter...");
+		let openai;
+		try {
+			openai = makeOpenAIClient();
+		} catch (err) {
+			return res.status(500).json({ error: err.message });
+		}
 
 		const completion = await openai.chat.completions.create({
 			model: "openai/gpt-4o-mini",

@@ -12,6 +12,11 @@ export default function VirtualLookViewer() {
 	const selectedKeyParts = selectedParts.filter((part) =>
 		["Case", "GPU", "Cooler"].includes(part.type),
 	);
+	const imageSrc = virtualLookUrl
+		? virtualLookUrl.startsWith("data:image/")
+			? virtualLookUrl
+			: `data:image/jpeg;base64,${virtualLookUrl}`
+		: "";
 
 	return (
 		<section className='space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/80'>
@@ -33,7 +38,7 @@ export default function VirtualLookViewer() {
 				) : virtualLookUrl ? (
 					<div className='relative aspect-video'>
 						<Image
-							src={virtualLookUrl}
+							src={imageSrc}
 							alt='Generated virtual PC build look'
 							fill
 							unoptimized
